@@ -37,6 +37,22 @@
 
 ---
 
+<h2>A note on versioning</h2>
+<p>
+  ZWeather ships as <code>0.1.0</code> — not because it's rough or experimental,
+  but because it hasn't yet been stress-tested by the wild variety of real-world
+  hardware, OS configurations and usage patterns that earns a <code>1.0.0</code>.
+  What it <em>has</em> been through is extensive dev-side testing: repeated crash
+  cycles, rapid UI stress testing and fixing anything that surfaced before release.
+</p>
+<p>
+  <code>0.1.0</code> here means <strong>fully working, dev-validated, no known
+  bugs</strong> — not "early access, use at your own risk." The version number
+  reflects epistemic honesty about untested unknowns, not the quality of what's there.
+</p>
+
+---
+
 ## Screenshots
 
 <div align="center">
