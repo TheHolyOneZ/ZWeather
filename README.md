@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="src-tauri/icons/64x64.png" alt="ZWeather" width="112" height="112" />
+<img src="public/icon.png" alt="ZWeather" width="112" height="112" />
 
 <h1>ZWeather</h1>
 
