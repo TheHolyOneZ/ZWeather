@@ -1,0 +1,62 @@
+{
+  "name": "zweather",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A cinematic, privacy-first desktop weather app. Built with Tauri 2, React 19 and Rust.",
+  "author": "TheHolyOneZ",
+  "homepage": "https://zsync.eu/zweather/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheHolyOneZ/ZWeather.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TheHolyOneZ/ZWeather/issues"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=9.15.0"
+  },
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@bybas/weather-icons": "^2.0.0",
+    "@tanstack/react-query": "^5.62.0",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-notification": "^2",
+    "@tauri-apps/plugin-opener": "^2",
+    "@tauri-apps/plugin-positioner": "^2",
+    "@tauri-apps/plugin-window-state": "^2",
+    "@types/leaflet": "^1.9.21",
+    "framer-motion": "^12.0.0",
+    "i18next": "^26.3.1",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.468.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-i18next": "^17.0.8",
+    "zustand": "^5.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4",
+    "@tauri-apps/cli": "^2",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "tailwindcss": "^4",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.4"
+  }
+}

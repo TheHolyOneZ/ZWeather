@@ -1,0 +1,44 @@
+[package]
+name = "zweather"
+version = "0.1.0"
+description = "Native desktop weather dashboard — no account, no telemetry"
+authors = ["TheHolyOneZ"]
+license = "GPL-3.0-only"
+edition = "2021"
+
+[lib]
+name = "zweather_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri                        = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-notification    = "2"
+tauri-plugin-opener          = "2"
+tauri-plugin-positioner      = { version = "2", features = ["tray-icon"] }
+tauri-plugin-single-instance = "2"
+tauri-plugin-window-state    = "2"
+tauri-plugin-shell           = "2"
+
+reqwest    = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio      = { version = "1", features = ["full"] }
+chrono     = { version = "0.4", features = ["serde"] }
+rusqlite   = { version = "0.32", features = ["bundled"] }
+uuid         = { version = "1", features = ["v4"] }
+urlencoding  = "2"
+quick-xml    = "0.36"
+anyhow     = "1"
+thiserror  = "2"
+tracing    = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[profile.release]
+panic         = "abort"
+lto           = "fat"
+codegen-units = 1
+opt-level     = "s"
+strip         = true
