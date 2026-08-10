@@ -1,6 +1,6 @@
 [package]
 name = "zweather"
-version = "0.1.0"
+version = "0.1.1"
 description = "Native desktop weather dashboard — no account, no telemetry"
 authors = ["TheHolyOneZ"]
 license = "GPL-3.0-only"

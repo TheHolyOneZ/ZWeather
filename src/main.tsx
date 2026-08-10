@@ -6,6 +6,9 @@ import { queryClient } from "./lib/queryClient";
 import "@/i18n";
 import "leaflet/dist/leaflet.css";
 import "@/styles/globals.css";
+import { applyPlatformAttribute } from "@/lib/platform";
+
+applyPlatformAttribute();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

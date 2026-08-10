@@ -12,3 +12,9 @@ export function isWindows(): boolean {
   if (typeof navigator === "undefined") return false;
   return /windows/i.test(navigator.userAgent);
 }
+
+export function applyPlatformAttribute(): void {
+  if (typeof document === "undefined") return;
+  const os = isWindows() ? "windows" : isMacOS() ? "macos" : isLinux() ? "linux" : "other";
+  document.documentElement.setAttribute("data-os", os);
+}

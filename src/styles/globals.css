@@ -136,6 +136,11 @@
     box-shadow: 0 0 0 1px var(--root-ring);
   }
 
+  [data-os="windows"] #root {
+    border-radius: 0;
+    box-shadow: none;
+  }
+
   body::after {
     content: "";
     position: fixed;
@@ -165,6 +170,8 @@
     background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hov); }
+  ::-webkit-scrollbar-corner { background: transparent; }
+  ::-webkit-resizer          { background: transparent; }
 }
 
 @layer utilities {

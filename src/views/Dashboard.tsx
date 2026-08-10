@@ -192,7 +192,7 @@ export function Dashboard() {
           <div className="flex flex-1 gap-4 px-4 pb-4 overflow-hidden min-h-0 w-full max-w-[1600px] mx-auto">
 
 
-            <div className="flex flex-col flex-1 gap-3 overflow-y-auto min-w-0">
+            <div className="flex flex-col flex-1 gap-3 overflow-y-auto overflow-x-hidden min-w-0">
 
 
               <div className="glass rounded-2xl p-5 shrink-0 relative overflow-hidden">
@@ -306,7 +306,7 @@ export function Dashboard() {
             </div>
 
 
-            <div className="w-64 shrink-0 flex flex-col gap-3 overflow-y-auto">
+            <div className="w-64 shrink-0 flex flex-col gap-3 overflow-y-auto overflow-x-hidden">
 
               {current && (
                 <div className="glass rounded-2xl p-4 shrink-0">

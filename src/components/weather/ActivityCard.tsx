@@ -48,12 +48,33 @@ function fmtW(kmh: number, u: WindUnit): string {
 
 type Score = "good" | "fair" | "poor";
 
+interface Verdict {
+  score: Score;
+  reason: string;
+}
+
 interface Activity {
   key: string;
   label: string;
   score: Score;
   reason: string;
   icon: React.ReactNode;
+}
+
+interface Conditions {
+  temp: number;
+  wind: number;
+  code: number;
+  inGolden: boolean;
+  isNight: boolean;
+  isPrecip: boolean;
+  isHeavy: boolean;
+  isStorm: boolean;
+  isFog: boolean;
+  isSnow: boolean;
+  tu: TempUnit;
+  wu: WindUnit;
+  t: TFunction;
 }
 
 function scoreLabel(s: Score, t: TFunction): string {
@@ -72,153 +93,138 @@ function scorePillStyle(s: Score): { background: string; color: string } {
 
 function computeActivities(c: CurrentWeather, now: number, tu: TempUnit, wu: WindUnit, t: TFunction): Activity[] {
   const { temperature: temp, wind_speed: wind, condition_code: code, sunrise, sunset } = c;
-  const inGolden = (now > sunrise && now < sunrise + 3600) || (now > sunset - 3600 && now < sunset);
-  const isNight  = now < sunrise || now > sunset;
-  const isPrecip = code >= 51;
-  const isHeavy  = code >= 65;
-  const isStorm  = code >= 95;
-  const isFog    = code === 45 || code === 48;
-  const isSnow   = (code >= 71 && code <= 77) || (code >= 85 && code <= 86);
-  const isHot    = temp >= 32;
-  const isDanger = temp >= 36;
-
-  const running: Score =
-    isDanger || temp < 0 ? "poor"
-    : temp >= 5 && temp <= 24 && !isPrecip && wind < 35 ? "good"
-    : temp <= 30 && !isHeavy ? "fair"
-    : "poor";
-
-  const cycling: Score =
-    isDanger || temp < 0 ? "poor"
-    : temp >= 5 && temp <= 26 && !isPrecip && wind < 30 ? "good"
-    : temp <= 32 && !isHeavy ? "fair"
-    : "poor";
-
-  const photo: Score =
-    isStorm ? "poor"
-    : inGolden && !isHeavy ? "good"
-    : !isHeavy && code <= 3 ? "good"
-    : !isHeavy && (code <= 48) ? "fair"
-    : "poor";
-
-  const outdoor: Score =
-    isDanger || temp < 5 ? "poor"
-    : temp >= 16 && temp <= 28 && !isPrecip && wind < 25 ? "good"
-    : !isHot && temp <= 32 && !isHeavy ? "fair"
-    : "poor";
-
-  const swimming: Score =
-    isStorm || temp < 20 ? "poor"
-    : temp >= 24 && code <= 3 && wind < 25 ? "good"
-    : temp >= 22 && !isHeavy && wind < 30 ? "fair"
-    : "poor";
-
-  const hiking: Score =
-    isStorm || isDanger || temp < 0 ? "poor"
-    : temp >= 8 && temp <= 24 && !isPrecip && wind < 30 ? "good"
-    : temp >= 0 && temp <= 30 && !isHeavy ? "fair"
-    : "poor";
-
-  const stargazing: Score =
-    !isNight ? "poor"
-    : code === 0 && wind < 20 ? "good"
-    : code <= 2 ? "fair"
-    : "poor";
-
-  const driving: Score =
-    isStorm || isFog || isHeavy || isSnow ? "poor"
-    : isPrecip || wind > 45 ? "fair"
-    : "good";
+  const cond: Conditions = {
+    temp,
+    wind,
+    code,
+    inGolden: (now > sunrise && now < sunrise + 3600) || (now > sunset - 3600 && now < sunset),
+    isNight: now < sunrise || now > sunset,
+    isPrecip: code >= 51,
+    isHeavy: code >= 65,
+    isStorm: code >= 95,
+    isFog: code === 45 || code === 48,
+    isSnow: (code >= 71 && code <= 77) || (code >= 85 && code <= 86),
+    tu,
+    wu,
+    t,
+  };
 
   return [
-    { key: "running",     label: t("activities.running"),     score: running,    reason: runningReason(temp, wind, isPrecip, isHeavy, tu, wu, t),   icon: <RunningIcon /> },
-    { key: "cycling",     label: t("activities.cycling"),     score: cycling,    reason: cyclingReason(temp, wind, isPrecip, isHeavy, tu, wu, t),   icon: <CyclingIcon /> },
-    { key: "hiking",      label: t("activities.hiking"),      score: hiking,     reason: hikingReason(temp, wind, isPrecip, isHeavy, isStorm, tu, wu, t), icon: <HikingIcon /> },
-    { key: "swimming",    label: t("activities.swimming"),    score: swimming,   reason: swimmingReason(temp, isStorm, isHeavy, code, tu, t),       icon: <SwimmingIcon /> },
-    { key: "outdoors",    label: t("activities.outdoors"),    score: outdoor,    reason: outdoorReason(temp, wind, isPrecip, isHeavy, tu, wu, t),   icon: <OutdoorIcon /> },
-    { key: "photography", label: t("activities.photography"), score: photo,      reason: photoReason(inGolden, isStorm, isHeavy, code, t),          icon: <CameraIcon /> },
-    { key: "stargazing",  label: t("activities.stargazing"),  score: stargazing, reason: stargazeReason(isNight, code, t),                          icon: <StarIcon /> },
-    { key: "driving",     label: t("activities.driving"),     score: driving,    reason: drivingReason(isFog, isSnow, isStorm, isHeavy, isPrecip, wind, wu, t), icon: <CarIcon /> },
+    { key: "running",     label: t("activities.running"),     ...evalRunning(cond),     icon: <RunningIcon /> },
+    { key: "cycling",     label: t("activities.cycling"),     ...evalCycling(cond),     icon: <CyclingIcon /> },
+    { key: "hiking",      label: t("activities.hiking"),      ...evalHiking(cond),      icon: <HikingIcon /> },
+    { key: "swimming",    label: t("activities.swimming"),    ...evalSwimming(cond),    icon: <SwimmingIcon /> },
+    { key: "outdoors",    label: t("activities.outdoors"),    ...evalOutdoors(cond),    icon: <OutdoorIcon /> },
+    { key: "photography", label: t("activities.photography"), ...evalPhotography(cond), icon: <CameraIcon /> },
+    { key: "stargazing",  label: t("activities.stargazing"),  ...evalStargazing(cond),  icon: <StarIcon /> },
+    { key: "driving",     label: t("activities.driving"),     ...evalDriving(cond),     icon: <CarIcon /> },
   ];
 }
 
-function runningReason(temp: number, wind: number, precip: boolean, heavy: boolean, tu: TempUnit, wu: WindUnit, t: TFunction): string {
-  if (temp >= 36) return t("reasons.dangerHeat", { t: fmtT(temp, tu) });
-  if (temp >= 32) return t("reasons.heatStress", { t: fmtT(temp, tu) });
-  if (heavy)      return t("reasons.precipitation");
-  if (temp > 28)  return t("reasons.hot", { t: fmtT(temp, tu) });
-  if (temp < 5)   return t("reasons.cold", { t: fmtT(temp, tu) });
-  if (wind > 35)  return t("reasons.windy", { w: fmtW(wind, wu) });
-  if (precip)     return t("reasons.lightRain");
-  return t("reasons.ideal");
+function verdict(score: Score, reason: string): Verdict {
+  return { score, reason };
 }
 
-function cyclingReason(temp: number, wind: number, precip: boolean, heavy: boolean, tu: TempUnit, wu: WindUnit, t: TFunction): string {
-  if (temp >= 36) return t("reasons.dangerHeat", { t: fmtT(temp, tu) });
-  if (temp >= 32) return t("reasons.heatStress", { t: fmtT(temp, tu) });
-  if (heavy)      return t("reasons.precipitation");
-  if (wind > 30)  return t("reasons.windy", { w: fmtW(wind, wu) });
-  if (temp > 26)  return t("reasons.hot", { t: fmtT(temp, tu) });
-  if (temp < 5)   return t("reasons.cold", { t: fmtT(temp, tu) });
-  if (precip)     return t("reasons.lightRain");
-  return t("reasons.ideal");
+function evalRunning(c: Conditions): Verdict {
+  const { temp, wind, isPrecip, isHeavy, tu, wu, t } = c;
+  if (temp >= 36) return verdict("poor", t("reasons.dangerHeat", { t: fmtT(temp, tu) }));
+  if (temp >= 32) return verdict("poor", t("reasons.heatStress", { t: fmtT(temp, tu) }));
+  if (temp < 0)   return verdict("poor", t("reasons.tooCold", { t: fmtT(temp, tu) }));
+  if (isHeavy)    return verdict("poor", t("reasons.precipitation"));
+  if (temp > 30)  return verdict("poor", t("reasons.tooHot", { t: fmtT(temp, tu) }));
+  if (temp >= 5 && temp <= 24 && !isPrecip && wind < 35) return verdict("good", t("reasons.ideal"));
+  if (wind >= 35) return verdict("fair", t("reasons.windy", { w: fmtW(wind, wu) }));
+  if (isPrecip)   return verdict("fair", t("reasons.lightRain"));
+  if (temp > 24)  return verdict("fair", t("reasons.hot", { t: fmtT(temp, tu) }));
+  return verdict("fair", t("reasons.cold", { t: fmtT(temp, tu) }));
 }
 
-function photoReason(golden: boolean, storm: boolean, heavy: boolean, code: number, t: TFunction): string {
-  if (storm) return t("reasons.stormy");
-  if (heavy) return t("reasons.heavyRain");
-  if (golden) return t("reasons.goldenHour");
-  if (code === 0 || code <= 2) return t("reasons.clearHarsh");
-  if (code === 3 || code <= 48) return t("reasons.softOvercast");
-  return t("reasons.cloudy");
+function evalCycling(c: Conditions): Verdict {
+  const { temp, wind, isPrecip, isHeavy, tu, wu, t } = c;
+  if (temp >= 36) return verdict("poor", t("reasons.dangerHeat", { t: fmtT(temp, tu) }));
+  if (temp < 0)   return verdict("poor", t("reasons.tooCold", { t: fmtT(temp, tu) }));
+  if (isHeavy)    return verdict("poor", t("reasons.precipitation"));
+  if (temp > 32)  return verdict("poor", t("reasons.tooHot", { t: fmtT(temp, tu) }));
+  if (temp >= 5 && temp <= 26 && !isPrecip && wind < 30) return verdict("good", t("reasons.ideal"));
+  if (temp >= 32) return verdict("fair", t("reasons.heatStress", { t: fmtT(temp, tu) }));
+  if (wind >= 30) return verdict("fair", t("reasons.windy", { w: fmtW(wind, wu) }));
+  if (isPrecip)   return verdict("fair", t("reasons.lightRain"));
+  if (temp > 26)  return verdict("fair", t("reasons.hot", { t: fmtT(temp, tu) }));
+  return verdict("fair", t("reasons.cold", { t: fmtT(temp, tu) }));
 }
 
-function outdoorReason(temp: number, wind: number, precip: boolean, heavy: boolean, tu: TempUnit, wu: WindUnit, t: TFunction): string {
-  if (temp >= 36) return t("reasons.dangerHeat", { t: fmtT(temp, tu) });
-  if (temp >= 32) return t("reasons.tooHot", { t: fmtT(temp, tu) });
-  if (heavy)      return t("reasons.precipitation");
-  if (temp < 10)  return t("reasons.cold", { t: fmtT(temp, tu) });
-  if (temp > 28)  return t("reasons.warm", { t: fmtT(temp, tu) });
-  if (wind > 25)  return t("reasons.windy", { w: fmtW(wind, wu) });
-  if (precip)     return t("reasons.lightRain");
-  return t("reasons.ideal");
+function evalHiking(c: Conditions): Verdict {
+  const { temp, wind, isPrecip, isHeavy, isStorm, tu, wu, t } = c;
+  if (isStorm)    return verdict("poor", t("reasons.stormy"));
+  if (temp >= 36) return verdict("poor", t("reasons.dangerHeat", { t: fmtT(temp, tu) }));
+  if (temp < 0)   return verdict("poor", t("reasons.tooCold", { t: fmtT(temp, tu) }));
+  if (isHeavy)    return verdict("poor", t("reasons.heavyRain"));
+  if (temp > 30)  return verdict("poor", t("reasons.tooHot", { t: fmtT(temp, tu) }));
+  if (temp >= 8 && temp <= 24 && !isPrecip && wind < 30) return verdict("good", t("reasons.ideal"));
+  if (wind >= 30) return verdict("fair", t("reasons.windy", { w: fmtW(wind, wu) }));
+  if (isPrecip)   return verdict("fair", t("reasons.lightRain"));
+  if (temp > 24)  return verdict("fair", t("reasons.hot", { t: fmtT(temp, tu) }));
+  return verdict("fair", t("reasons.cool", { t: fmtT(temp, tu) }));
 }
 
-function hikingReason(temp: number, wind: number, precip: boolean, heavy: boolean, storm: boolean, tu: TempUnit, wu: WindUnit, t: TFunction): string {
-  if (storm)      return t("reasons.stormy");
-  if (temp >= 36) return t("reasons.dangerHeat", { t: fmtT(temp, tu) });
-  if (heavy)      return t("reasons.heavyRain");
-  if (temp < 0)   return t("reasons.cold", { t: fmtT(temp, tu) });
-  if (temp > 28)  return t("reasons.hot", { t: fmtT(temp, tu) });
-  if (wind > 30)  return t("reasons.windy", { w: fmtW(wind, wu) });
-  if (precip)     return t("reasons.lightRain");
-  return t("reasons.ideal");
+function evalSwimming(c: Conditions): Verdict {
+  const { temp, wind, code, isPrecip, isHeavy, isStorm, isFog, tu, wu, t } = c;
+  if (isStorm)    return verdict("poor", t("reasons.stormy"));
+  if (isHeavy)    return verdict("poor", t("reasons.heavyRain"));
+  if (temp < 22)  return verdict("poor", t("reasons.tooCold", { t: fmtT(temp, tu) }));
+  if (wind >= 30) return verdict("poor", t("reasons.windy", { w: fmtW(wind, wu) }));
+  if (temp >= 24 && code <= 3 && wind < 25) return verdict("good", t("reasons.ideal"));
+  if (isPrecip)   return verdict("fair", t("reasons.lightRain"));
+  if (isFog)      return verdict("fair", t("reasons.fog"));
+  if (code > 3)   return verdict("fair", t("reasons.cloudy"));
+  if (wind >= 25) return verdict("fair", t("reasons.breezy", { w: fmtW(wind, wu) }));
+  return verdict("fair", t("reasons.cool", { t: fmtT(temp, tu) }));
 }
 
-function swimmingReason(temp: number, storm: boolean, heavy: boolean, code: number, tu: TempUnit, t: TFunction): string {
-  if (storm)     return t("reasons.stormy");
-  if (heavy)     return t("reasons.heavyRain");
-  if (temp < 20) return t("reasons.cold", { t: fmtT(temp, tu) });
-  if (code > 48) return t("reasons.lightRain");
-  if (code > 2)  return t("reasons.cloudy");
-  return t("reasons.ideal");
+function evalOutdoors(c: Conditions): Verdict {
+  const { temp, wind, isPrecip, isHeavy, tu, wu, t } = c;
+  if (temp >= 36) return verdict("poor", t("reasons.dangerHeat", { t: fmtT(temp, tu) }));
+  if (temp >= 32) return verdict("poor", t("reasons.tooHot", { t: fmtT(temp, tu) }));
+  if (temp < 5)   return verdict("poor", t("reasons.tooCold", { t: fmtT(temp, tu) }));
+  if (isHeavy)    return verdict("poor", t("reasons.precipitation"));
+  if (temp >= 16 && temp <= 28 && !isPrecip && wind < 25) return verdict("good", t("reasons.ideal"));
+  if (wind >= 25) return verdict("fair", t("reasons.windy", { w: fmtW(wind, wu) }));
+  if (isPrecip)   return verdict("fair", t("reasons.lightRain"));
+  if (temp > 28)  return verdict("fair", t("reasons.warm", { t: fmtT(temp, tu) }));
+  return verdict("fair", t("reasons.cool", { t: fmtT(temp, tu) }));
 }
 
-function stargazeReason(isNight: boolean, code: number, t: TFunction): string {
-  if (!isNight)  return t("reasons.daylight");
-  if (code === 0) return t("reasons.ideal");
-  if (code <= 2) return t("reasons.softOvercast");
-  return t("reasons.cloudy");
+function evalPhotography(c: Conditions): Verdict {
+  const { code, inGolden, isHeavy, isStorm, isFog, t } = c;
+  if (isStorm)     return verdict("poor", t("reasons.stormy"));
+  if (isHeavy)     return verdict("poor", t("reasons.heavyRain"));
+  if (inGolden)    return verdict("good", t("reasons.goldenHour"));
+  if (code <= 2)   return verdict("good", t("reasons.clearHarsh"));
+  if (code === 3)  return verdict("good", t("reasons.softOvercast"));
+  if (isFog)       return verdict("fair", t("reasons.fog"));
+  if (code <= 48)  return verdict("fair", t("reasons.cloudy"));
+  return verdict("poor", t("reasons.precipitation"));
 }
 
-function drivingReason(fog: boolean, snow: boolean, storm: boolean, heavy: boolean, precip: boolean, wind: number, wu: WindUnit, t: TFunction): string {
-  if (storm)     return t("reasons.stormy");
-  if (fog)       return t("reasons.fog");
-  if (snow)      return t("reasons.slippery");
-  if (heavy)     return t("reasons.heavyRain");
-  if (wind > 45) return t("reasons.windy", { w: fmtW(wind, wu) });
-  if (precip)    return t("reasons.lightRain");
-  return t("reasons.ideal");
+function evalStargazing(c: Conditions): Verdict {
+  const { code, wind, isNight, isFog, wu, t } = c;
+  if (!isNight)   return verdict("poor", t("reasons.daylight"));
+  if (isFog)      return verdict("poor", t("reasons.fog"));
+  if (code === 0 && wind < 20) return verdict("good", t("reasons.ideal"));
+  if (code === 0) return verdict("fair", t("reasons.windy", { w: fmtW(wind, wu) }));
+  if (code <= 2)  return verdict("fair", t("reasons.someClouds"));
+  return verdict("poor", t("reasons.cloudy"));
+}
+
+function evalDriving(c: Conditions): Verdict {
+  const { wind, isPrecip, isHeavy, isStorm, isFog, isSnow, wu, t } = c;
+  if (isStorm)   return verdict("poor", t("reasons.stormy"));
+  if (isFog)     return verdict("poor", t("reasons.fog"));
+  if (isSnow)    return verdict("poor", t("reasons.slippery"));
+  if (isHeavy)   return verdict("poor", t("reasons.heavyRain"));
+  if (wind > 45) return verdict("fair", t("reasons.windy", { w: fmtW(wind, wu) }));
+  if (isPrecip)  return verdict("fair", t("reasons.lightRain"));
+  return verdict("good", t("reasons.ideal"));
 }
 
 export function ActivityCard({ current, now, tempUnit = "C", windUnit = "kmh", airQuality, className }: ActivityCardProps) {
@@ -232,7 +238,7 @@ export function ActivityCard({ current, now, tempUnit = "C", windUnit = "kmh", a
   return (
     <GlassCard className={`p-4 flex flex-col ${className ?? ""}`}>
       <p className="text-[11px] text-white/55 uppercase tracking-widest mb-3 shrink-0">{t("sections.suitability")}</p>
-      <div className="flex flex-col gap-3 overflow-y-auto no-scrollbar min-h-0 pr-1">
+      <div className="flex flex-col gap-3 overflow-y-auto overflow-x-hidden no-scrollbar min-h-0 pr-1">
         {activities.map((a) => (
           <div key={a.label} className="flex flex-col gap-1">
             <div className="flex items-start gap-2.5">
