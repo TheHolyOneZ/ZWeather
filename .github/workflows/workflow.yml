@@ -1,0 +1,318 @@
+name: Release ZWeather (Windows + macOS)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version without the leading v (blank = read from package.json)"
+        required: false
+        default: ""
+      prerelease:
+        description: "Mark the draft as a pre-release"
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: short
+  COREPACK_ENABLE_AUTO_PIN: "0"
+  COREPACK_ENABLE_STRICT: "0"
+
+jobs:
+
+  draft-release:
+    name: Create draft release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      tag: ${{ steps.resolve.outputs.tag }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: resolve
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION=$(node -p "require('./package.json').version")
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION"   >> "$GITHUB_OUTPUT"
+          echo "Releasing v$VERSION"
+
+      - name: Create or reuse draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.resolve.outputs.tag }}
+          VERSION: ${{ steps.resolve.outputs.version }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Draft $TAG already exists, reusing it."
+            exit 0
+          fi
+          FLAGS=(--draft --title "ZWeather $VERSION" --target "$GITHUB_SHA" --generate-notes)
+          if [ "$PRERELEASE" = "true" ]; then FLAGS+=(--prerelease); fi
+          gh release create "$TAG" "${FLAGS[@]}"
+
+  build-windows:
+    name: Windows x64
+    needs: draft-release
+    runs-on: windows-2025
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Set up Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Prepend Cargo bin to PATH
+        shell: pwsh
+        run: |
+          "$env:USERPROFILE\.cargo\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Rust build cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          key: windows-x64
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build NSIS + MSI
+        run: pnpm tauri build --bundles nsis,msi
+
+      - name: List bundle output
+        if: always()
+        shell: pwsh
+        run: |
+          Get-ChildItem -Recurse src-tauri\target\release\bundle\nsis -ErrorAction SilentlyContinue
+          Get-ChildItem -Recurse src-tauri\target\release\bundle\msi  -ErrorAction SilentlyContinue
+
+      - name: Upload to draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.draft-release.outputs.tag }}
+        run: |
+          shopt -s nullglob
+          FILES=(src-tauri/target/release/bundle/nsis/*.exe src-tauri/target/release/bundle/msi/*.msi)
+          if [ ${#FILES[@]} -eq 0 ]; then echo "No Windows bundles produced"; exit 1; fi
+          printf '%s\n' "${FILES[@]}"
+          gh release upload "$TAG" "${FILES[@]}" --clobber
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64
+          path: |
+            src-tauri/target/release/bundle/nsis/*.exe
+            src-tauri/target/release/bundle/msi/*.msi
+          if-no-files-found: error
+          retention-days: 30
+
+  build-macos-intel:
+    name: macOS Intel x64
+    needs: draft-release
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Set up Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Prepend Cargo bin to PATH
+        run: |
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          echo "CARGO=$HOME/.cargo/bin/cargo" >> $GITHUB_ENV
+
+      - name: Add x86_64-apple-darwin target
+        run: rustup target add x86_64-apple-darwin
+
+      - name: Rust build cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          key: macos-intel
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build DMG (Intel x64)
+        run: pnpm tauri build --bundles dmg --target x86_64-apple-darwin
+        env:
+          APPLE_SIGNING_IDENTITY: "-"
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: List bundle output
+        if: always()
+        run: find src-tauri/target/x86_64-apple-darwin/release/bundle -type f 2>/dev/null || echo "(not found)"
+
+      - name: Upload to draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.draft-release.outputs.tag }}
+        run: |
+          shopt -s nullglob
+          FILES=(src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg)
+          if [ ${#FILES[@]} -eq 0 ]; then echo "No Intel DMG produced"; exit 1; fi
+          printf '%s\n' "${FILES[@]}"
+          gh release upload "$TAG" "${FILES[@]}" --clobber
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-intel-x64
+          path: src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/*.dmg
+          if-no-files-found: error
+          retention-days: 30
+
+  build-macos-silicon:
+    name: macOS Apple Silicon
+    needs: draft-release
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Set up Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Prepend Cargo bin to PATH
+        run: |
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          echo "CARGO=$HOME/.cargo/bin/cargo" >> $GITHUB_ENV
+
+      - name: Rust build cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          key: macos-silicon
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build DMG (Apple Silicon)
+        run: pnpm tauri build --bundles dmg
+        env:
+          APPLE_SIGNING_IDENTITY: "-"
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: List bundle output
+        if: always()
+        run: find src-tauri/target/release/bundle -type f 2>/dev/null || echo "(not found)"
+
+      - name: Upload to draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.draft-release.outputs.tag }}
+        run: |
+          shopt -s nullglob
+          FILES=(src-tauri/target/release/bundle/dmg/*.dmg)
+          if [ ${#FILES[@]} -eq 0 ]; then echo "No Apple Silicon DMG produced"; exit 1; fi
+          printf '%s\n' "${FILES[@]}"
+          gh release upload "$TAG" "${FILES[@]}" --clobber
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-apple-silicon
+          path: src-tauri/target/release/bundle/dmg/*.dmg
+          if-no-files-found: error
+          retention-days: 30
+
+  checksums:
+    name: Checksums for uploaded assets
+    needs: [draft-release, build-windows, build-macos-intel, build-macos-silicon]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded
+
+      - name: Flatten and hash
+        run: |
+          mkdir -p release
+          find downloaded -type f \( -name '*.exe' -o -name '*.msi' -o -name '*.dmg' \) -exec cp {} release/ \;
+          cd release
+          ls -lah
+          sha256sum *.exe *.msi *.dmg > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Attach checksums to draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.draft-release.outputs.tag }}
+        run: gh release upload "$TAG" release/SHA256SUMS.txt --clobber
+
+      - name: Upload combined bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: zweather-windows-macos
+          path: release/*
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Summary
+        env:
+          TAG: ${{ needs.draft-release.outputs.tag }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          {
+            echo "### Draft release $TAG is ready"
+            echo ""
+            echo "Windows and macOS assets are attached. The release is still a **draft** — nothing is public."
+            echo ""
+            echo "https://github.com/$GH_REPO/releases"
+          } >> "$GITHUB_STEP_SUMMARY"
