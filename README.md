@@ -249,9 +249,11 @@ A small pill in the title bar shows when the data was last updated. It turns �
 
 | | |
 |---|---|
-| **Tray tooltip** | Live temperature for your active location *(macOS / Windows)* |
-| **Left-click** | Compact popover with current conditions and a 6-hour strip |
+| **Tray icon** | Live condition icon and/or temperature for your primary location — configurable in Settings |
+| **Tray tooltip** | Location · condition · temperature *(Windows / macOS)* |
+| **Left-click** | Compact popover next to the tray icon — current conditions and a 6-hour strip; closes when you click away *(Windows / macOS)* |
 | **Right-click** | *Open Dashboard* · *Quit* |
+| **Closing the dashboard** | ZWeather keeps running in the tray and the dashboard is fully released, so it uses next to no CPU or memory until you reopen it. Severe-weather notifications keep working. |
 
 ### ⚙️ Settings
 
@@ -314,7 +316,7 @@ A slide-out panel with every option you need:
 
 ### 🪟 Window UX
 
-- Borderless, transparent window with a custom title bar
+- Borderless window with a custom title bar *(translucent with rounded corners on macOS / Linux, opaque on Windows)*
 - **Single instance** — re-launching focuses the existing window
 - **Window state remembered** between sessions (size · position)
 - First-launch **setup wizard** for time format, units and language
@@ -401,7 +403,15 @@ Prebuilt installers for **Windows, macOS (Intel & Apple Silicon) and Linux** liv
 
 ### → **[zsync.eu/zweather](https://zsync.eu/zweather/)**
 
-The download page hosts every release format — `.exe` / `.msi` (Windows), `.dmg` (macOS Intel & Apple Silicon), `.deb` / `.rpm` / `.AppImage` (Linux) — alongside a `SHA256SUMS.txt` file you can use to verify the integrity of any download.
+The download page hosts every release format — `.exe` / `.msi` (Windows), `.dmg` (macOS Intel & Apple Silicon), `.deb` / `.rpm` / `.AppImage` (Linux) — alongside a `SHA256SUMS.txt` file you can use to verify the integrity of any download. The same files are attached to every [GitHub release](https://github.com/TheHolyOneZ/ZWeather/releases).
+
+| Platform | Requirement |
+|---|---|
+| Windows | 10 or 11, x64 |
+| macOS | 11 Big Sur or newer, Apple Silicon or Intel |
+| Linux | x86_64 with glibc 2.35+ — Ubuntu 22.04+, Debian 12+, Fedora 36+ |
+
+What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 
 ---
 

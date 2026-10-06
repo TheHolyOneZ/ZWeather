@@ -22,11 +22,15 @@ upgrading in place keeps every location and preference.
   placed next to the tray icon, on the monitor the icon is on, kept inside that
   monitor's work area (never over the taskbar), and sized correctly on setups
   that mix different display scales — e.g. a 1080p screen next to an ultrawide.
-- **Clicking outside the tray popover did not close it.** It now hides when it
-  loses focus; clicking the tray icon while it is open closes it instead of
+- **Clicking outside the tray popover did not close it.** On Windows, WebView2
+  never reports the popover losing focus, so ZWeather now watches the real
+  foreground window while the popover is open and hides it as soon as you click
+  anywhere else. Clicking the tray icon while it is open closes it instead of
   re-opening it.
-- **"Open full dashboard" in the popover did nothing.** It only hid the popover;
-  it now opens (or re-creates) the dashboard.
+- **"Open full dashboard" in the popover and "Open Dashboard" in the tray's
+  right-click menu did nothing.** The button only hid the popover, and on Windows
+  re-creating the dashboard from a menu handler deadlocked the app's event loop.
+  The dashboard is now always re-created off the UI thread.
 - **The tray popover could stay on loading placeholders forever.** It loaded its
   data once at startup and never noticed locations added later in the dashboard
   — which is exactly what happens on a fresh install. It now refreshes when opened

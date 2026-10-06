@@ -311,7 +311,7 @@ pub fn set_tray_icon(
 }
 
 #[tauri::command]
-pub fn open_dashboard(app: AppHandle) {
+pub async fn open_dashboard(app: AppHandle) {
     crate::tray::show_main(&app);
 }
 

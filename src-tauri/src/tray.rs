@@ -1,3 +1,6 @@
+use std::sync::atomic::{AtomicBool, Ordering};
+#[cfg(windows)]
+use std::sync::atomic::AtomicU64;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
@@ -21,6 +24,15 @@ const BLUR_REOPEN_GUARD: Duration = Duration::from_millis(300);
 #[derive(Default)]
 pub struct PopoverState {
     last_blur_hide: Mutex<Option<Instant>>,
+    #[cfg(windows)]
+    session: AtomicU64,
+    creating_main: AtomicBool,
+}
+
+fn mark_blur_hide(app: &AppHandle) {
+    if let Some(state) = app.try_state::<PopoverState>() {
+        *state.last_blur_hide.lock().unwrap() = Some(Instant::now());
+    }
 }
 
 pub fn setup_tray(app: &AppHandle) -> Result<()> {
@@ -60,9 +72,7 @@ pub fn setup_tray(app: &AppHandle) -> Result<()> {
         pop.on_window_event(move |event| {
             if let WindowEvent::Focused(false) = event {
                 if pop_clone.is_visible().unwrap_or(false) {
-                    if let Some(state) = app_clone.try_state::<PopoverState>() {
-                        *state.last_blur_hide.lock().unwrap() = Some(Instant::now());
-                    }
+                    mark_blur_hide(&app_clone);
                     hide_popover(&pop_clone);
                 }
             }
@@ -92,6 +102,57 @@ fn toggle_tray_popover(app: &AppHandle, tray_rect: Rect, cursor: PhysicalPositio
     let _ = win.show();
     let _ = win.set_focus();
     let _ = win.emit_to("tray", "zw://tray-visibility", true);
+
+    #[cfg(windows)]
+    watch_click_away(app, &win);
+}
+
+#[cfg(windows)]
+mod foreground {
+    #[link(name = "user32")]
+    extern "system" {
+        fn GetForegroundWindow() -> *mut core::ffi::c_void;
+    }
+
+    pub fn is_foreground(win: &tauri::WebviewWindow) -> bool {
+        let Ok(hwnd) = win.hwnd() else { return false };
+        unsafe { GetForegroundWindow() as usize == hwnd.0 as usize }
+    }
+}
+
+
+#[cfg(windows)]
+fn watch_click_away(app: &AppHandle, win: &WebviewWindow) {
+    let Some(state) = app.try_state::<PopoverState>() else { return };
+    let session = state.session.fetch_add(1, Ordering::SeqCst) + 1;
+    let app = app.clone();
+    let win = win.clone();
+
+    std::thread::spawn(move || {
+        let started = Instant::now();
+        let mut was_foreground = false;
+        let mut refocused = false;
+        loop {
+            std::thread::sleep(Duration::from_millis(80));
+            let Some(state) = app.try_state::<PopoverState>() else { return };
+            if state.session.load(Ordering::SeqCst) != session {
+                return;
+            }
+            if !win.is_visible().unwrap_or(false) {
+                return;
+            }
+            if foreground::is_foreground(&win) {
+                was_foreground = true;
+            } else if was_foreground {
+                mark_blur_hide(&app);
+                hide_popover(&win);
+                return;
+            } else if !refocused && started.elapsed() > Duration::from_millis(250) {
+                refocused = true;
+                let _ = win.set_focus();
+            }
+        }
+    });
 }
 
 pub fn hide_popover(win: &WebviewWindow) {
@@ -166,6 +227,21 @@ pub fn show_main(app: &AppHandle) {
         return;
     }
 
+    let Some(state) = app.try_state::<PopoverState>() else { return };
+    if state.creating_main.swap(true, Ordering::SeqCst) {
+        return;
+    }
+
+    let app = app.clone();
+    std::thread::spawn(move || {
+        create_main(&app);
+        if let Some(state) = app.try_state::<PopoverState>() {
+            state.creating_main.store(false, Ordering::SeqCst);
+        }
+    });
+}
+
+fn create_main(app: &AppHandle) {
     let Some(config) = app
         .config()
         .app
