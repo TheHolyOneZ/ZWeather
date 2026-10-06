@@ -279,7 +279,10 @@
   },
   "tray": {
     "feelsLike": "Sensación {{value}}",
-    "openDashboard": "Abrir panel completo"
+    "openDashboard": "Abrir panel completo",
+    "noLocation": "Aún no hay ubicación — abre el panel para añadir una.",
+    "loadError": "No se pudo cargar el tiempo.",
+    "retry": "Reintentar"
   },
   "titlebar": {
     "settings": "Ajustes",

@@ -19,10 +19,7 @@ pub fn run() {
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_positioner::init())
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            if let Some(win) = app.get_webview_window("main") {
-                let _ = win.show();
-                let _ = win.set_focus();
-            }
+            tray::show_main(app);
         }))
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
@@ -45,34 +42,7 @@ pub fn run() {
             });
 
             if let Some(win) = app.get_webview_window("main") {
-
-
-                let _ = win.set_decorations(false);
-                let _ = win.show();
-                let _ = win.set_focus();
-
-
-                let win_clone = win.clone();
-                win.on_window_event(move |event| {
-                    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                        api.prevent_close();
-                        let _ = win_clone.hide();
-                    }
-                });
-
-                #[cfg(target_os = "linux")]
-                {
-                    if let Ok(size) = win.inner_size() {
-                        let _ = win.set_size(tauri::Size::Physical(tauri::PhysicalSize {
-                            width: size.width + 1,
-                            height: size.height,
-                        }));
-                        let _ = win.set_size(tauri::Size::Physical(tauri::PhysicalSize {
-                            width: size.width,
-                            height: size.height,
-                        }));
-                    }
-                }
+                tray::init_main_window(&win);
             }
 
             if let Some(win) = app.get_webview_window("tray") {
@@ -98,7 +68,16 @@ pub fn run() {
             commands::search_locations,
             commands::refresh_location_names,
             commands::set_tray_tooltip,
+            commands::set_tray_icon,
+            commands::open_dashboard,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running ZWeather");
+        .build(tauri::generate_context!())
+        .expect("error while building ZWeather")
+        .run(|_app, event| {
+
+
+            if let tauri::RunEvent::ExitRequested { code: None, api, .. } = event {
+                api.prevent_exit();
+            }
+        });
 }

@@ -1,7 +1,7 @@
 {
   "name": "zweather",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A cinematic, privacy-first desktop weather app. Built with Tauri 2, React 19 and Rust.",
   "author": "TheHolyOneZ",
   "homepage": "https://zsync.eu/zweather/",

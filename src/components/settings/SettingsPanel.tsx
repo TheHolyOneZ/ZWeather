@@ -10,7 +10,6 @@ import { SettingPillGroup } from "./SettingPillGroup";
 import { LanguageSelect } from "./LanguageSelect";
 import { ToggleSwitch } from "./ToggleSwitch";
 import { SettingSlider } from "./SettingSlider";
-import { isLinux } from "@/lib/platform";
 import { useNotificationPermission } from "@/hooks/useNotificationPermission";
 import { sendTestNotification, type PermissionState } from "@/lib/notifications";
 
@@ -285,17 +284,15 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
           </SectionCard>
 
 
-          {!isLinux() && (
-            <SectionCard icon={<MonitorSmartphone size={13} />} title={t("settings.sectionTray")}>
-              <SettingRow
-                icon={<MonitorSmartphone size={14} />}
-                label={t("settings.trayContent")}
-                description={t("settings.trayContentDesc")}
-              >
-                <SettingPillGroup options={TRAY_STYLE_OPTIONS} value={settings.tray_icon_style} onChange={(v) => update("tray_icon_style", v)} />
-              </SettingRow>
-            </SectionCard>
-          )}
+          <SectionCard icon={<MonitorSmartphone size={13} />} title={t("settings.sectionTray")}>
+            <SettingRow
+              icon={<MonitorSmartphone size={14} />}
+              label={t("settings.trayContent")}
+              description={t("settings.trayContentDesc")}
+            >
+              <SettingPillGroup options={TRAY_STYLE_OPTIONS} value={settings.tray_icon_style} onChange={(v) => update("tray_icon_style", v)} />
+            </SettingRow>
+          </SectionCard>
 
 
           <SectionCard icon={<Globe size={13} />} title={t("settings.sectionLanguage")}>

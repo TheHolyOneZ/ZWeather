@@ -279,7 +279,10 @@
   },
   "tray": {
     "feelsLike": "Feels like {{value}}",
-    "openDashboard": "Open full dashboard"
+    "openDashboard": "Open full dashboard",
+    "noLocation": "No location yet — open the dashboard to add one.",
+    "loadError": "Couldn't load the weather.",
+    "retry": "Retry"
   },
   "titlebar": {
     "settings": "Settings",

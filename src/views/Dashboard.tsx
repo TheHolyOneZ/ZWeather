@@ -31,8 +31,6 @@ import { StatBar, TrendArrow, UvPill, HumidityIcon, ThermometerIcon, GaugeIcon, 
 import { AirQualityCard } from "@/components/weather/AirQualityCard";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useCurrentWeather, useHourlyForecast, useDailyForecast, useAlerts, useAirQuality } from "@/hooks/useWeather";
-import { useAlertNotifications } from "@/hooks/useAlertNotifications";
-import { useTrayTooltip } from "@/hooks/useTrayTooltip";
 import { useTheme } from "@/hooks/useTheme";
 import { useHorizontalWheel } from "@/hooks/useHorizontalWheel";
 import { formatTimeAt, formatNowAt, formatDateLineAt } from "@/lib/time";
@@ -81,14 +79,12 @@ export function Dashboard() {
   const { data: daily } = useDailyForecast(activeLocationId);
   const { data: alerts } = useAlerts(activeLocationId);
   const { data: airQuality } = useAirQuality(activeLocationId);
-  useAlertNotifications(alerts);
 
 
   const now = Date.now() / 1000;
   const isDay = current ? (now > current.sunrise && now < current.sunset) : true;
   const isEmpty = !locationsLoading && (!locations || locations.length === 0);
   const activeLocation = locations?.find((l) => l.id === activeLocationId);
-  useTrayTooltip(current, activeLocation?.name);
 
 
   const todayForecast = daily?.[0];

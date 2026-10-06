@@ -279,7 +279,10 @@
   },
   "tray": {
     "feelsLike": "Ressenti {{value}}",
-    "openDashboard": "Ouvrir le tableau de bord"
+    "openDashboard": "Ouvrir le tableau de bord",
+    "noLocation": "Aucun lieu pour l'instant — ouvrez le tableau de bord pour en ajouter un.",
+    "loadError": "Impossible de charger la météo.",
+    "retry": "Réessayer"
   },
   "titlebar": {
     "settings": "Paramètres",

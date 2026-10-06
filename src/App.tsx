@@ -7,13 +7,19 @@ import { Toaster } from "@/components/ui/Toaster";
 import { CinematicIntro } from "@/components/intro/CinematicIntro";
 import { isIntroEnabled } from "@/lib/introPreference";
 
+declare global {
+  interface Window {
+    __ZW_REOPENED__?: boolean;
+  }
+}
+
 const windowLabel = getCurrentWindow().label;
 
 export default function App() {
 
 
   const [showIntro, setShowIntro] = useState(
-    () => windowLabel === "main" && isIntroEnabled(),
+    () => windowLabel === "main" && !window.__ZW_REOPENED__ && isIntroEnabled(),
   );
 
   if (windowLabel === "tray") {

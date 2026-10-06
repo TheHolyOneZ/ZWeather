@@ -279,7 +279,10 @@
   },
   "tray": {
     "feelsLike": "Gefühlt {{value}}",
-    "openDashboard": "Volles Dashboard öffnen"
+    "openDashboard": "Volles Dashboard öffnen",
+    "noLocation": "Noch kein Ort — öffne das Dashboard, um einen hinzuzufügen.",
+    "loadError": "Wetter konnte nicht geladen werden.",
+    "retry": "Erneut versuchen"
   },
   "titlebar": {
     "settings": "Einstellungen",

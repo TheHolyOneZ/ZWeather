@@ -279,7 +279,10 @@
   },
   "tray": {
     "feelsLike": "Percepita {{value}}",
-    "openDashboard": "Apri dashboard completa"
+    "openDashboard": "Apri dashboard completa",
+    "noLocation": "Nessuna località — apri la dashboard per aggiungerne una.",
+    "loadError": "Impossibile caricare il meteo.",
+    "retry": "Riprova"
   },
   "titlebar": {
     "settings": "Impostazioni",

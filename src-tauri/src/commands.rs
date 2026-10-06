@@ -1,7 +1,7 @@
 use tauri::{AppHandle, State};
 use uuid::Uuid;
 use crate::db::Database;
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::models::*;
 use crate::weather_fetcher::WeatherFetcher;
 use crate::alerts::AlertFetcher;
@@ -281,10 +281,38 @@ pub async fn search_locations(query: String, language: Option<String>) -> Result
 
 #[tauri::command]
 pub fn set_tray_tooltip(app: AppHandle, tooltip: String) -> Result<()> {
-    if let Some(tray) = app.tray_by_id("main-tray") {
+    if let Some(tray) = app.tray_by_id(crate::tray::TRAY_ID) {
         let _ = tray.set_tooltip(Some(&tooltip));
     }
     Ok(())
+}
+
+
+#[tauri::command]
+pub fn set_tray_icon(
+    app: AppHandle,
+    rgba: Option<Vec<u8>>,
+    width: u32,
+    height: u32,
+) -> Result<()> {
+    let Some(tray) = app.tray_by_id(crate::tray::TRAY_ID) else { return Ok(()) };
+    let icon = match rgba {
+        Some(bytes) if bytes.len() == (width * height * 4) as usize => {
+            tauri::image::Image::new_owned(bytes, width, height)
+        }
+        Some(_) => return Err(Error::Custom("tray icon buffer size mismatch".into())),
+        None => match app.default_window_icon() {
+            Some(icon) => icon.clone().to_owned(),
+            None => return Ok(()),
+        },
+    };
+    tray.set_icon(Some(icon))?;
+    Ok(())
+}
+
+#[tauri::command]
+pub fn open_dashboard(app: AppHandle) {
+    crate::tray::show_main(&app);
 }
 
 async fn geocode_match(
