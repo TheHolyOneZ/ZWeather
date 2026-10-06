@@ -46,6 +46,10 @@ upgrading in place keeps every location and preference.
   closed.
 - The *System tray* settings section is now shown on Linux too, since the tray
   icon itself now reflects the setting there.
+- Linux packages (deb, rpm, AppImage) are now built by the release workflow on
+  Ubuntu 22.04 instead of locally, lowering the requirement from glibc 2.39 to
+  2.35 — Ubuntu 22.04 and Debian 12 are supported again. All seven installers
+  now share one `SHA256SUMS.txt` on the draft release.
 
 ## [0.1.1] — 2026-08-10
 

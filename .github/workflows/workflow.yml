@@ -1,4 +1,4 @@
-name: Release ZWeather (Windows + macOS)
+name: Release ZWeather (Windows + macOS + Linux)
 
 on:
   workflow_dispatch:
@@ -269,9 +269,92 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+  build-linux:
+    name: Linux x64 (deb, rpm, AppImage)
+    needs: draft-release
+    # 22.04 on purpose: the packages require at least the glibc of the build
+    # machine, so building on the oldest supported Ubuntu keeps them running on
+    # Ubuntu 22.04+, Debian 12+ and Fedora.
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libxdo-dev \
+            libssl-dev \
+            patchelf \
+            file \
+            build-essential
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Set up Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Prepend Cargo bin to PATH
+        run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Rust build cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          key: linux-x64
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build deb + rpm + AppImage
+        run: pnpm tauri build --bundles deb,rpm,appimage
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: "1"
+          NO_STRIP: "true"
+
+      - name: List bundle output
+        if: always()
+        run: find src-tauri/target/release/bundle -maxdepth 2 -type f 2>/dev/null || echo "(not found)"
+
+      - name: Upload to draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.draft-release.outputs.tag }}
+        run: |
+          shopt -s nullglob
+          FILES=(src-tauri/target/release/bundle/deb/*.deb src-tauri/target/release/bundle/rpm/*.rpm src-tauri/target/release/bundle/appimage/*.AppImage)
+          if [ ${#FILES[@]} -ne 3 ]; then echo "Expected 3 Linux bundles, got ${#FILES[@]}"; exit 1; fi
+          printf '%s\n' "${FILES[@]}"
+          gh release upload "$TAG" "${FILES[@]}" --clobber
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64
+          path: |
+            src-tauri/target/release/bundle/deb/*.deb
+            src-tauri/target/release/bundle/rpm/*.rpm
+            src-tauri/target/release/bundle/appimage/*.AppImage
+          if-no-files-found: error
+          retention-days: 30
+
   checksums:
     name: Checksums for uploaded assets
-    needs: [draft-release, build-windows, build-macos-intel, build-macos-silicon]
+    needs: [draft-release, build-windows, build-macos-intel, build-macos-silicon, build-linux]
     runs-on: ubuntu-latest
 
     steps:
@@ -283,10 +366,10 @@ jobs:
       - name: Flatten and hash
         run: |
           mkdir -p release
-          find downloaded -type f \( -name '*.exe' -o -name '*.msi' -o -name '*.dmg' \) -exec cp {} release/ \;
+          find downloaded -type f \( -name '*.exe' -o -name '*.msi' -o -name '*.dmg' -o -name '*.deb' -o -name '*.rpm' -o -name '*.AppImage' \) -exec cp {} release/ \;
           cd release
           ls -lah
-          sha256sum *.exe *.msi *.dmg > SHA256SUMS.txt
+          sha256sum *.exe *.msi *.dmg *.deb *.rpm *.AppImage > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
       - name: Attach checksums to draft release
@@ -299,7 +382,7 @@ jobs:
       - name: Upload combined bundle
         uses: actions/upload-artifact@v4
         with:
-          name: zweather-windows-macos
+          name: zweather-all-platforms
           path: release/*
           if-no-files-found: error
           retention-days: 90
@@ -312,7 +395,7 @@ jobs:
           {
             echo "### Draft release $TAG is ready"
             echo ""
-            echo "Windows and macOS assets are attached. The release is still a **draft** — nothing is public."
+            echo "Windows, macOS and Linux assets are attached. The release is still a **draft** — nothing is public."
             echo ""
             echo "https://github.com/$GH_REPO/releases"
           } >> "$GITHUB_STEP_SUMMARY"
