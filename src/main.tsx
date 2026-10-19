@@ -7,8 +7,10 @@ import "@/i18n";
 import "leaflet/dist/leaflet.css";
 import "@/styles/globals.css";
 import { applyPlatformAttribute } from "@/lib/platform";
+import { initAmbientPause } from "@/lib/ambient";
 
 applyPlatformAttribute();
+initAmbientPause();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

@@ -1,5 +1,3 @@
-
-
 use std::time::Duration;
 use serde_json::json;
 use tauri::{AppHandle, Emitter, Manager};
@@ -10,9 +8,7 @@ use crate::alerts::AlertFetcher;
 use crate::db::Database;
 use crate::weather_fetcher::WeatherFetcher;
 
-
 const MIN_INTERVAL_MINUTES: u64 = 5;
-
 
 const LOCATION_SPACING_MS: u64 = 600;
 
@@ -22,7 +18,6 @@ pub async fn run(app: AppHandle) {
     let alerts = AlertFetcher::new();
 
     loop {
-
         let interval = read_interval_minutes(&app).max(MIN_INTERVAL_MINUTES);
         sleep(Duration::from_secs(interval * 60)).await;
 

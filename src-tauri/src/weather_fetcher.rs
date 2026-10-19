@@ -1,5 +1,16 @@
 use crate::models::{CurrentWeather, HourlyForecast, DailyForecast};
-use crate::error::Result;
+use crate::error::{Error, Result};
+
+pub(crate) async fn get_open_meteo(client: &reqwest::Client, url: &str) -> Result<serde_json::Value> {
+    let resp = client.get(url).send().await?;
+    let status = resp.status();
+    let body: serde_json::Value = resp.json().await?;
+    if !status.is_success() || body["error"].as_bool() == Some(true) {
+        let reason = body["reason"].as_str().unwrap_or("request failed");
+        return Err(Error::Custom(format!("Open-Meteo {status}: {reason}")));
+    }
+    Ok(body)
+}
 
 pub struct WeatherFetcher {
     client: reqwest::Client,
@@ -8,7 +19,7 @@ pub struct WeatherFetcher {
 impl WeatherFetcher {
     pub fn new() -> Self {
         let client = reqwest::Client::builder()
-            .user_agent("ZWeather/0.1.0 (https://github.com/TheHolyOneZ/ZWeather)")
+            .user_agent("ZWeather/0.1.3 (https://github.com/TheHolyOneZ/ZWeather)")
             .build()
             .expect("failed to build HTTP client");
         Self { client }
@@ -33,14 +44,13 @@ impl WeatherFetcher {
              &forecast_days=1"
         );
 
-        let resp: serde_json::Value = self.client.get(&url).send().await?.json().await?;
+        let resp = get_open_meteo(&self.client, &url).await?;
 
         let utc_offset = resp["utc_offset_seconds"].as_i64().unwrap_or(0);
         let timezone = resp["timezone"].as_str().unwrap_or("UTC").to_string();
         let timezone_abbr = resp["timezone_abbreviation"].as_str().unwrap_or("UTC").to_string();
         let c = &resp["current"];
         let d = &resp["daily"];
-
 
         let pressure_now = c["surface_pressure"].as_f64().unwrap_or(0.0);
         let hourly_pressures = resp["hourly"]["surface_pressure"]
@@ -99,7 +109,7 @@ impl WeatherFetcher {
              &forecast_days=10"
         );
 
-        let resp: serde_json::Value = self.client.get(&url).send().await?.json().await?;
+        let resp = get_open_meteo(&self.client, &url).await?;
         let utc_offset = resp["utc_offset_seconds"].as_i64().unwrap_or(0);
         let h = &resp["hourly"];
 
@@ -144,7 +154,7 @@ impl WeatherFetcher {
              &forecast_days=10"
         );
 
-        let resp: serde_json::Value = self.client.get(&url).send().await?.json().await?;
+        let resp = get_open_meteo(&self.client, &url).await?;
         let utc_offset = resp["utc_offset_seconds"].as_i64().unwrap_or(0);
         let d = &resp["daily"];
 

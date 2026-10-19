@@ -1,5 +1,3 @@
-
-
 const cache = new Map<string, Promise<string>>();
 
 const ANIM_TAGS = ["animate", "animateTransform", "animateMotion", "animateColor", "set"];
@@ -13,7 +11,6 @@ function stripAnimations(svg: string): string {
   return out;
 }
 
-
 interface ParentAccum {
   transformOrigin?: string;
   animations: string[];
@@ -24,7 +21,6 @@ function nextId(): string {
   animCounter = (animCounter + 1) % 1_000_000;
   return `zw${animCounter}`;
 }
-
 
 let headStyleEl: HTMLStyleElement | null = null;
 function appendKeyframes(blocks: string[]): void {
@@ -50,7 +46,6 @@ function parseRotationCenter(values: string | null, from: string | null): { cx: 
   };
 }
 
-
 function smilToCss(svg: string, stripRotate = false): string {
   if (typeof DOMParser === "undefined") return svg;
   let doc: Document;
@@ -73,7 +68,6 @@ function smilToCss(svg: string, stripRotate = false): string {
     }
     return a;
   }
-
 
   Array.from(root.getElementsByTagName("animateTransform")).forEach((anim) => {
     const parent = anim.parentElement;
@@ -107,7 +101,6 @@ function smilToCss(svg: string, stripRotate = false): string {
         return;
       }
 
-
       const last = vals[vals.length - 1];
       const first = vals[0];
       const oscillating =
@@ -127,7 +120,6 @@ function smilToCss(svg: string, stripRotate = false): string {
     }
     anim.remove();
   });
-
 
   Array.from(root.getElementsByTagName("animate")).forEach((anim) => {
     const parent = anim.parentElement;
@@ -157,11 +149,9 @@ function smilToCss(svg: string, stripRotate = false): string {
     anim.remove();
   });
 
-
   ["animateMotion", "animateColor", "set"].forEach((tag) => {
     Array.from(root.getElementsByTagName(tag)).forEach((el) => el.remove());
   });
-
 
   parents.forEach((acc, parent) => {
     const pieces: string[] = ["transform-box:view-box"];
@@ -170,7 +160,6 @@ function smilToCss(svg: string, stripRotate = false): string {
     const existing = parent.getAttribute("style") || "";
     parent.setAttribute("style", existing ? `${existing};${pieces.join(";")}` : pieces.join(";"));
   });
-
 
   appendKeyframes(keyframeBlocks);
 

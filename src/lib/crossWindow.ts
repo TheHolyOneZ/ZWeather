@@ -1,6 +1,5 @@
 import { emit } from "@tauri-apps/api/event";
 
-
 export const DATA_CHANGED_EVENT = "zw://data-changed";
 
 export type DataChangedPayload = { keys: string[] };

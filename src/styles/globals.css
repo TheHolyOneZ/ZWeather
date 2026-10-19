@@ -174,10 +174,26 @@
   ::-webkit-resizer          { background: transparent; }
 }
 
+/* Ambient loops (see src/lib/ambient.ts) and animated weather icons freeze while
+   the window is in the background or the dashboard is covered by an overlay. */
+[data-ambient-paused] .zw-ambient,
+[data-ambient-paused] .zw-ambient *,
+[data-ambient-paused] .meteocon * {
+  animation-play-state: paused !important;
+}
+
+/* List icons (WeatherIcon `idle`) only animate while their row is hovered.
+   `animation: none` rather than paused: WebKit keeps re-resolving paused
+   animations on every frame, which costs nearly as much as running them. */
+.zw-icon-host:not(:hover) .meteocon[data-idle] * {
+  animation: none !important;
+}
+
 @layer utilities {
+  /* No backdrop-filter here: cards sit on a smooth, static gradient where a
+     blur is invisible, but WebKitGTK re-runs every backdrop blur on every
+     composited frame, which made the dashboard crawl on high-refresh screens. */
   .glass {
-    backdrop-filter: blur(24px) saturate(140%) brightness(1.05);
-    -webkit-backdrop-filter: blur(24px) saturate(140%) brightness(1.05);
     background-color: var(--color-e1);
     border: 1px solid var(--edge);
     box-shadow:
@@ -269,11 +285,18 @@
   font-size: 11px;
   font-family: inherit;
   font-weight: 500;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   white-space: nowrap;
   pointer-events: none;
+}
+
+.leaflet-container .leaflet-control-attribution {
+  background: rgba(10, 10, 16, 0.6);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 9px;
+  font-family: inherit;
+  padding: 1px 6px;
+  border-top-left-radius: 6px;
 }
 
 .leaflet-tooltip.zw-label::before,

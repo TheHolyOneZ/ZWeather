@@ -19,11 +19,12 @@ interface Opts {
   opacity?: number;
   fadeMs?: number;
 
-
   preloadAll?: boolean;
 }
 
 const TILE_SIZE = 256;
+const MAX_NATIVE_ZOOM = 7;
+const RETRY_MS = 15_000;
 
 export function createTileTimelineLayer(opts: Opts): WeatherLayer {
   let map: L.Map | null = null;
@@ -38,6 +39,7 @@ export function createTileTimelineLayer(opts: Opts): WeatherLayer {
   const fadeMs = opts.fadeMs ?? 220;
   const preloadAll = opts.preloadAll ?? true;
   let currentFrameIdx = -1;
+  let retryTimer: number | null = null;
 
   function emitReady() {
     readyListeners.forEach((cb) => cb({ ...ready }));
@@ -59,6 +61,7 @@ export function createTileTimelineLayer(opts: Opts): WeatherLayer {
 
       try {
         const res = await fetch(opts.manifestUrl);
+        if (!res.ok) throw new Error(`manifest ${res.status}`);
         const data = (await res.json()) as RainViewerResponse;
         host = data.host;
         const past = opts.framePickerPast(data);
@@ -66,24 +69,21 @@ export function createTileTimelineLayer(opts: Opts): WeatherLayer {
         frames = [...past, ...future];
         emitFrames();
 
-
         if (frames.length === 0) {
           ready = { ready: true, loaded: 0, total: 0 };
           emitReady();
           return;
         }
 
-
         const defaultIdx = Math.max(0, past.length - 1);
 
         if (preloadAll) {
-
           preloadLayers = frames.map((frame) => {
             const layer = L.tileLayer(tileUrl(frame), {
               opacity: 0,
               minZoom: 0,
               maxZoom: 11,
-              maxNativeZoom: 10,
+              maxNativeZoom: MAX_NATIVE_ZOOM,
               tileSize: TILE_SIZE,
             });
             layer.once("load", () => {
@@ -98,19 +98,24 @@ export function createTileTimelineLayer(opts: Opts): WeatherLayer {
           emitReady();
           this.setFrame?.(defaultIdx);
         } else {
-
-
           ready = { ready: false, loaded: 0, total: 1 };
           emitReady();
           this.setFrame?.(defaultIdx);
         }
       } catch {
-        ready = { ready: false, loaded: 0, total: 0 };
+        if (map !== m) return;
+        ready = { ready: false, loaded: 0, total: 0, error: true };
         emitReady();
+        retryTimer = window.setTimeout(() => {
+          retryTimer = null;
+          if (map === m) this.mount(m);
+        }, RETRY_MS);
       }
     },
 
     unmount() {
+      if (retryTimer != null) window.clearTimeout(retryTimer);
+      retryTimer = null;
       if (!map) return;
       preloadLayers.forEach((l) => map!.removeLayer(l));
       preloadLayers = [];
@@ -137,11 +142,10 @@ export function createTileTimelineLayer(opts: Opts): WeatherLayer {
         opacity: 0,
         minZoom: 0,
         maxZoom: 11,
-        maxNativeZoom: 10,
+        maxNativeZoom: MAX_NATIVE_ZOOM,
         tileSize: TILE_SIZE,
         keepBuffer: 4,
       }).addTo(map);
-
 
       if (!preloadAll && !ready.ready) {
         ready = { ready: true, loaded: 1, total: 1 };

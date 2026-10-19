@@ -6,7 +6,6 @@ interface CinematicIntroProps {
   onComplete: () => void;
 }
 
-
 export function CinematicIntro({ onComplete }: CinematicIntroProps) {
   const { t } = useTranslation();
   const [stage, setStage] = useState(0);
@@ -20,7 +19,6 @@ export function CinematicIntro({ onComplete }: CinematicIntroProps) {
     ];
     return () => timers.forEach(window.clearTimeout);
   }, []);
-
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -185,7 +183,6 @@ export function CinematicIntro({ onComplete }: CinematicIntroProps) {
     </motion.div>
   );
 }
-
 
 function IntroScene({ size }: { size: number }) {
   const rays = [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330];

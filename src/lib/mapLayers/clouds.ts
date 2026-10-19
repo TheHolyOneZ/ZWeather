@@ -1,5 +1,3 @@
-
-
 import L from "leaflet";
 import type { GridSample } from "@/lib/openMeteoGrid";
 import { fetchGridSample, latLonToGrid, sample } from "@/lib/openMeteoGrid";
@@ -13,6 +11,7 @@ import type { LayerReadyState, WeatherLayer } from "./types";
 
 const GRID_SIZE = 10;
 const REFRESH_DEBOUNCE_MS = 1200;
+const RETRY_MS = 15_000;
 const LOW_RES_SCALE = 0.25;
 const MAX_ALPHA = 0.75;
 
@@ -79,7 +78,6 @@ export function createCloudsLayer(): WeatherLayer {
       ctx.imageSmoothingQuality = "high";
       ctx.drawImage(low, 0, 0, W, H);
     } catch {
-
     }
   }
 
@@ -106,13 +104,14 @@ export function createCloudsLayer(): WeatherLayer {
       ready = { ready: true, loaded: 1, total: 1 };
       emitReady();
       scheduleRedraw();
-    } catch {
+    } catch (e) {
       if (isInitial && map) {
-        ready = { ready: false, loaded: 0, total: 1 };
+        ready = { ready: false, loaded: 0, total: 1, error: true };
         emitReady();
       }
+      throw e;
     }
-  }, { debounceMs: REFRESH_DEBOUNCE_MS, urgentMs: 60 });
+  }, { debounceMs: REFRESH_DEBOUNCE_MS, urgentMs: 60, retryMs: RETRY_MS });
 
   const onMove = () => {
     resizeCanvas();

@@ -1,6 +1,7 @@
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { Loop } from "@/components/ui/Loop";
+import { loopStyle } from "@/lib/ambient";
 import { getMoonPhase } from "@/lib/moon";
 
 const CRATERS = [
@@ -58,122 +59,117 @@ function MoonSVG({ phase }: { phase: number }) {
   `;
 
   return (
-    <motion.div
+    <Loop
       animate={{ y: [0, -2.2, 0] }}
-      transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      transition={{ duration: 10, ease: "easeInOut" }}
       style={{ width: size, height: size }}
-      className="shrink-0"
+      className="shrink-0 relative"
     >
-      <motion.svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${vb} ${vb}`}
+      <Loop
         animate={{ rotate: [-0.9, 0.9, -0.9] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 20, ease: "easeInOut" }}
+        className="absolute inset-0"
       >
-        <defs>
-          <radialGradient id="moonBody" cx="38%" cy="32%" r="78%">
-            <stop offset="0%" stopColor="#f8fafc" />
-            <stop offset="35%" stopColor="#e2e8f0" />
-            <stop offset="70%" stopColor="#a8b0bd" />
-            <stop offset="100%" stopColor="#6b7280" />
-          </radialGradient>
-          <radialGradient id="moonRim" cx="50%" cy="50%" r="50%">
-            <stop offset="85%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(15,23,42,0.55)" />
-          </radialGradient>
-          <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(186,200,230,0.30)" />
-            <stop offset="50%" stopColor="rgba(186,200,230,0.10)" />
-            <stop offset="100%" stopColor="rgba(186,200,230,0)" />
-          </radialGradient>
-          <radialGradient id="moonHighlight" cx="32%" cy="28%" r="35%">
-            <stop offset="0%" stopColor="rgba(255,255,255,0.55)" />
-            <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-          </radialGradient>
-          <radialGradient id="darkBody" cx="50%" cy="50%" r="55%">
-            <stop offset="0%" stopColor="#1e293b" />
-            <stop offset="100%" stopColor="#0b1220" />
-          </radialGradient>
-          <radialGradient id="craterShade" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(40,38,48,0.85)" />
-            <stop offset="60%" stopColor="rgba(80,78,90,0.55)" />
-            <stop offset="100%" stopColor="rgba(120,118,130,0)" />
-          </radialGradient>
-          <radialGradient id="craterDark" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(20,18,28,0.95)" />
-            <stop offset="100%" stopColor="rgba(70,68,80,0)" />
-          </radialGradient>
+        <svg
+          width={size}
+          height={size}
+          viewBox={`0 0 ${vb} ${vb}`}
+          className="absolute inset-0"
+          style={{ willChange: "transform" }}
+        >
+          {STARS.map((s, i) => (
+            <circle
+              key={`star-${i}`}
+              cx={s.cx}
+              cy={s.cy}
+              r={s.r}
+              fill="#e0e7ff"
+              style={loopStyle(
+                { opacity: [s.op * 0.4, s.op, s.op * 0.4] },
+                { duration: 3 + (i % 3), ease: "easeInOut", delay: i * 0.3 },
+              )}
+            />
+          ))}
+        </svg>
 
-          <filter id="terminatorBlur" x="-10%" y="-10%" width="120%" height="120%">
-            <feGaussianBlur stdDeviation="0.35" />
-          </filter>
-
-          <filter id="surfaceTexture" x="0" y="0" width="100%" height="100%">
-            <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="7" />
-            <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.18 0" />
-            <feComposite in2="SourceGraphic" operator="in" />
-          </filter>
-
-          {!isNew && !isFull && (
-            <clipPath id="litClip">
-              <path d={litPath} />
-            </clipPath>
-          )}
-          <clipPath id="moonClip">
-            <circle cx={cx} cy={cy} r={r} />
-          </clipPath>
-        </defs>
-
-
-        {STARS.map((s, i) => (
-          <motion.circle
-            key={`star-${i}`}
-            cx={s.cx}
-            cy={s.cy}
-            r={s.r}
-            fill="#e0e7ff"
-            animate={{ opacity: [s.op * 0.4, s.op, s.op * 0.4] }}
-            transition={{ duration: 3 + (i % 3), repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
-          />
-        ))}
-
-
-        <motion.circle
-          cx={cx}
-          cy={cy}
-          r={38}
-          fill="url(#moonGlow)"
+        <Loop
           animate={{ opacity: [0.6, 0.9, 0.6], scale: [1, 1.04, 1] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          style={{ transformOrigin: `${cx}px ${cy}px` }}
-        />
+          transition={{ duration: 6, ease: "easeInOut" }}
+          className="absolute inset-0"
+        >
+          <svg width={size} height={size} viewBox={`0 0 ${vb} ${vb}`} className="absolute inset-0">
+            <defs>
+              <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="rgba(186,200,230,0.30)" />
+                <stop offset="50%" stopColor="rgba(186,200,230,0.10)" />
+                <stop offset="100%" stopColor="rgba(186,200,230,0)" />
+              </radialGradient>
+            </defs>
+            <circle cx={cx} cy={cy} r={38} fill="url(#moonGlow)" />
+          </svg>
+        </Loop>
+
+        <svg
+          width={size}
+          height={size}
+          viewBox={`0 0 ${vb} ${vb}`}
+          className="absolute inset-0"
+        >
+          <defs>
+            <radialGradient id="moonBody" cx="38%" cy="32%" r="78%">
+              <stop offset="0%" stopColor="#f8fafc" />
+              <stop offset="35%" stopColor="#e2e8f0" />
+              <stop offset="70%" stopColor="#a8b0bd" />
+              <stop offset="100%" stopColor="#6b7280" />
+            </radialGradient>
+            <radialGradient id="moonRim" cx="50%" cy="50%" r="50%">
+              <stop offset="85%" stopColor="rgba(0,0,0,0)" />
+              <stop offset="100%" stopColor="rgba(15,23,42,0.55)" />
+            </radialGradient>
+            <radialGradient id="moonHighlight" cx="32%" cy="28%" r="35%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.55)" />
+              <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+            </radialGradient>
+            <radialGradient id="darkBody" cx="50%" cy="50%" r="55%">
+              <stop offset="0%" stopColor="#1e293b" />
+              <stop offset="100%" stopColor="#0b1220" />
+            </radialGradient>
+            <radialGradient id="craterShade" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(40,38,48,0.85)" />
+              <stop offset="60%" stopColor="rgba(80,78,90,0.55)" />
+              <stop offset="100%" stopColor="rgba(120,118,130,0)" />
+            </radialGradient>
+            <radialGradient id="craterDark" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="rgba(20,18,28,0.95)" />
+              <stop offset="100%" stopColor="rgba(70,68,80,0)" />
+            </radialGradient>
+
+            <filter id="terminatorBlur" x="-10%" y="-10%" width="120%" height="120%">
+              <feGaussianBlur stdDeviation="0.35" />
+            </filter>
+
+            <filter id="surfaceTexture" x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="7" />
+              <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.18 0" />
+              <feComposite in2="SourceGraphic" operator="in" />
+            </filter>
+
+            {!isNew && !isFull && (
+              <clipPath id="litClip">
+                <path d={litPath} />
+              </clipPath>
+            )}
+            <clipPath id="moonClip">
+              <circle cx={cx} cy={cy} r={r} />
+            </clipPath>
+          </defs>
 
 
-        <circle cx={cx} cy={cy} r={r} fill="url(#darkBody)" />
+          <circle cx={cx} cy={cy} r={r} fill="url(#darkBody)" />
 
 
-        {isFull && (
-          <g>
-            <circle cx={cx} cy={cy} r={r} fill="url(#moonBody)" />
-            <g clipPath="url(#moonClip)">
-              <rect x={cx - r} y={cy - r} width={r * 2} height={r * 2} filter="url(#surfaceTexture)" />
-              {CRATERS.map((c, i) => (
-                <g key={i}>
-                  <circle cx={c.cx} cy={c.cy} r={c.r} fill={c.soft ? "url(#craterShade)" : "url(#craterDark)"} opacity={c.op} />
-                  <circle cx={c.cx - c.r * 0.25} cy={c.cy - c.r * 0.25} r={c.r * 0.6} fill="rgba(255,255,255,0.08)" />
-                </g>
-              ))}
-              <circle cx={cx} cy={cy} r={r} fill="url(#moonHighlight)" />
-              <circle cx={cx} cy={cy} r={r} fill="url(#moonRim)" />
-            </g>
-          </g>
-        )}
-
-
-        {!isNew && !isFull && (
-          <>
-            <g clipPath="url(#litClip)" filter="url(#terminatorBlur)">
+          {isFull && (
+            <g>
               <circle cx={cx} cy={cy} r={r} fill="url(#moonBody)" />
               <g clipPath="url(#moonClip)">
                 <rect x={cx - r} y={cy - r} width={r * 2} height={r * 2} filter="url(#surfaceTexture)" />
@@ -184,23 +180,43 @@ function MoonSVG({ phase }: { phase: number }) {
                   </g>
                 ))}
                 <circle cx={cx} cy={cy} r={r} fill="url(#moonHighlight)" />
+                <circle cx={cx} cy={cy} r={r} fill="url(#moonRim)" />
               </g>
             </g>
-            <circle cx={cx} cy={cy} r={r} fill="url(#moonRim)" />
-          </>
-        )}
+          )}
 
 
-        {!isFull && !isNew && (
-          <g clipPath="url(#moonClip)">
-            <circle cx={cx} cy={cy} r={r} fill="rgba(99,120,160,0.06)" />
-          </g>
-        )}
+          {!isNew && !isFull && (
+            <>
+              <g clipPath="url(#litClip)" filter="url(#terminatorBlur)">
+                <circle cx={cx} cy={cy} r={r} fill="url(#moonBody)" />
+                <g clipPath="url(#moonClip)">
+                  <rect x={cx - r} y={cy - r} width={r * 2} height={r * 2} filter="url(#surfaceTexture)" />
+                  {CRATERS.map((c, i) => (
+                    <g key={i}>
+                      <circle cx={c.cx} cy={c.cy} r={c.r} fill={c.soft ? "url(#craterShade)" : "url(#craterDark)"} opacity={c.op} />
+                      <circle cx={c.cx - c.r * 0.25} cy={c.cy - c.r * 0.25} r={c.r * 0.6} fill="rgba(255,255,255,0.08)" />
+                    </g>
+                  ))}
+                  <circle cx={cx} cy={cy} r={r} fill="url(#moonHighlight)" />
+                </g>
+              </g>
+              <circle cx={cx} cy={cy} r={r} fill="url(#moonRim)" />
+            </>
+          )}
 
 
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="0.5" />
-      </motion.svg>
-    </motion.div>
+          {!isFull && !isNew && (
+            <g clipPath="url(#moonClip)">
+              <circle cx={cx} cy={cy} r={r} fill="rgba(99,120,160,0.06)" />
+            </g>
+          )}
+
+
+          <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="0.5" />
+        </svg>
+      </Loop>
+    </Loop>
   );
 }
 

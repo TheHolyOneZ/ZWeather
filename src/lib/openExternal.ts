@@ -8,7 +8,6 @@ export async function openExternal(url: string): Promise<void> {
     try {
       window.open(url, "_blank", "noopener,noreferrer");
     } catch {
-
     }
   }
 }

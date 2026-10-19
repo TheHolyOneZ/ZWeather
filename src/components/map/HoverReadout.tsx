@@ -66,7 +66,7 @@ export function HoverReadout({ map, layer }: Props) {
       className="absolute z-[415] pointer-events-none"
       style={{ left, top }}
     >
-      <div className="rounded-lg bg-black/80 border border-white/[0.10] backdrop-blur-md shadow-lg px-2.5 py-1.5 flex items-center gap-2 tabular-nums">
+      <div className="rounded-lg bg-black/85 border border-white/[0.10] shadow-lg px-2.5 py-1.5 flex items-center gap-2 tabular-nums">
         {data.temp != null && (
           <span className="text-[12px] font-bold text-white">
             {Math.round(convertTemp(data.temp, tempUnit))}

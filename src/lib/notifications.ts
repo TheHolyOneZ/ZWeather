@@ -1,5 +1,3 @@
-
-
 import {
   isPermissionGranted,
   requestPermission,
@@ -30,7 +28,6 @@ export function onPermissionChange(cb: (s: PermissionState) => void): () => void
   return () => listeners.delete(cb);
 }
 
-
 export async function refreshPermission(): Promise<PermissionState> {
   try {
     const granted = await isPermissionGranted();
@@ -38,13 +35,10 @@ export async function refreshPermission(): Promise<PermissionState> {
     setPermission(state);
     return state;
   } catch {
-
-
     setPermission("denied");
     return "denied";
   }
 }
-
 
 export async function ensurePermission(): Promise<PermissionState> {
   if (cachedPermission === "granted") return "granted";
@@ -84,7 +78,6 @@ export interface NotifyInput {
   icon?: string;
 }
 
-
 export async function notify(input: NotifyInput): Promise<boolean> {
   const perm = await ensurePermission();
   if (perm !== "granted") return false;
@@ -99,14 +92,12 @@ export async function notify(input: NotifyInput): Promise<boolean> {
     await sendNotification(opts);
     return true;
   } catch (err) {
-
     console.warn("[notify] sendNotification failed", err);
 
     void refreshPermission();
     return false;
   }
 }
-
 
 export async function notifyMany(
   inputs: NotifyInput[],

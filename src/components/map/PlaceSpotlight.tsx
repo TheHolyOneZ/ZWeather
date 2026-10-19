@@ -15,7 +15,6 @@ export function PlaceSpotlight({ location }: Props) {
   const { data } = useCurrentWeather(location.id);
   const { temp_unit, wind_unit, time_format } = useSettingsStore((s) => s.settings);
 
-
   const [, force] = useState(0);
   useEffect(() => {
     const id = window.setInterval(() => force((n) => n + 1), 30_000);
@@ -31,7 +30,7 @@ export function PlaceSpotlight({ location }: Props) {
 
   return (
     <div className="absolute top-3 left-3 z-[410] pointer-events-none">
-      <div className="rounded-2xl bg-black/65 border border-white/[0.08] backdrop-blur-md shadow-lg px-3.5 py-2.5 flex items-center gap-3.5">
+      <div className="rounded-2xl bg-black/75 border border-white/[0.08] shadow-lg px-3.5 py-2.5 flex items-center gap-3.5">
         <div>
           <p className="text-[10px] uppercase tracking-wider text-white/45 font-semibold leading-none">
             {shortName}

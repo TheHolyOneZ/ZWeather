@@ -24,10 +24,10 @@ export interface LayerReadyState {
   ready: boolean;
   loaded: number;
   total: number;
+  error?: boolean;
 }
 
 export interface CursorReadout {
-
   temp?: number;
 
   windSpeed?: number;

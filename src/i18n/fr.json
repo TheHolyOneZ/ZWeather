@@ -179,7 +179,7 @@
     "apiWeatherGov": "Alertes météo (États-Unis)",
     "apiMeteoAlarm": "Alertes météo (UE)",
     "apiRainViewer": "Manifeste des tuiles radar (précipitations)",
-    "apiCartoDB": "Fond de carte (Dark Matter, © OSM)",
+    "apiEsri": "Fond de carte (Esri Dark Gray Canvas, © OSM)",
     "sectionDeveloper": "Développeur",
     "replaySetup": "Rejouer la configuration",
     "replaySetupDesc": "Réaffiche l'animation d'intro et l'assistant de configuration au prochain lancement.",
@@ -337,6 +337,7 @@
     "previous": "Image précédente",
     "next": "Image suivante",
     "loading": "Chargement",
+    "loadFailed": "Service météo surchargé, nouvel essai…",
     "layers": {
       "precipitation": "Pluie",
       "clouds": "Nuages",

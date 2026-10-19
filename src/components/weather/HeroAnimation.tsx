@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { Loop } from "@/components/ui/Loop";
 import { meteoconCloud } from "@/lib/meteocons";
 import { useSettingsStore } from "@/store/settingsStore";
 
@@ -46,7 +46,6 @@ export function HeroAnimation({ conditionCode, isDay }: HeroAnimationProps) {
   const animatedIcons = useSettingsStore((s) => s.settings.animated_icons);
   const kind = codeToAnim(conditionCode, isDay);
 
-
   if (!animatedIcons) {
     return (
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
@@ -88,13 +87,11 @@ export function HeroAnimation({ conditionCode, isDay }: HeroAnimationProps) {
   );
 }
 
-
 function parseRgba(input: string): { r: number; g: number; b: number; a: number } {
   const m = input.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+))?\s*\)/i);
   if (!m) return { r: 255, g: 255, b: 255, a: 1 };
   return { r: +m[1], g: +m[2], b: +m[3], a: m[4] ? +m[4] : 1 };
 }
-
 
 function tintFilter(tint: string): string {
   const { r, g, b } = parseRgba(tint);
@@ -106,51 +103,52 @@ function tintFilter(tint: string): string {
   return `brightness(${brightness.toFixed(2)}) saturate(${saturate}) ${hueShift ? `hue-rotate(${hueShift}deg)` : ""}`;
 }
 
-
 function ClearDayLayer() {
   return (
     <>
-      <motion.div
+      <Loop
         className="absolute top-[-45%] right-[-25%] w-[80%] h-[180%] rounded-full"
-        style={{
+        paint={{
           background:
             "radial-gradient(circle, rgba(251,191,36,0.30) 0%, rgba(251,146,60,0.10) 35%, rgba(251,146,60,0.02) 60%, transparent 80%)",
           filter: "blur(8px)",
         }}
         animate={{ scale: [1, 1.06, 1], opacity: [0.85, 1, 0.85] }}
-        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 11, ease: "easeInOut" }}
       />
-      <motion.div
+      <Loop
         className="absolute top-[-20%] right-[5%] w-[45%] h-[110%] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(253,224,71,0.18) 0%, transparent 65%)",
-          filter: "blur(6px)",
           mixBlendMode: "screen",
         }}
+        paint={{
+          background: "radial-gradient(circle, rgba(253,224,71,0.18) 0%, transparent 65%)",
+          filter: "blur(6px)",
+        }}
         animate={{ x: [0, 14, -6, 0], y: [0, -8, 4, 0] }}
-        transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 26, ease: "easeInOut" }}
       />
-      <motion.div
+      <Loop
         className="absolute bottom-[-40%] left-[-25%] w-[65%] h-[130%] rounded-full"
-        style={{
+        paint={{
           background:
             "radial-gradient(circle, rgba(14,165,233,0.14) 0%, rgba(56,189,248,0.04) 45%, transparent 70%)",
           filter: "blur(10px)",
         }}
         animate={{ x: [0, 10, 0], y: [0, -8, 0], scale: [1, 1.04, 1] }}
-        transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 28, ease: "easeInOut" }}
       />
-      <motion.div
+      <Loop
         className="absolute left-0 right-0 bottom-[10%] h-[25%]"
-        style={{
+        paint={{
           background: "linear-gradient(180deg, transparent, rgba(251,191,36,0.06), transparent)",
           filter: "blur(4px)",
         }}
         animate={{ opacity: [0.4, 0.8, 0.4], y: [0, -3, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 6, ease: "easeInOut" }}
       />
       {DUST.map((d, i) => (
-        <motion.div
+        <Loop
           key={i}
           className="absolute rounded-full"
           style={{
@@ -164,28 +162,26 @@ function ClearDayLayer() {
           animate={{ y: [0, -14, 0], x: [0, d.dx, 0], opacity: [0.1, 0.85, 0.1] }}
           transition={{
             duration: 5 + (i % 4) * 1.5,
-            repeat: Infinity,
             ease: "easeInOut",
             delay: i * 0.45,
           }}
         />
       ))}
-      <motion.div
+      <Loop
         className="absolute top-[20%] right-[35%] w-3 h-3 rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(254,243,199,0.6), transparent 70%)", filter: "blur(2px)" }}
+        paint={{ background: "radial-gradient(circle, rgba(254,243,199,0.6), transparent 70%)", filter: "blur(2px)" }}
         animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.3, 1] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 7, ease: "easeInOut" }}
       />
-      <motion.div
+      <Loop
         className="absolute top-[55%] right-[55%] w-2 h-2 rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(254,215,170,0.5), transparent 70%)", filter: "blur(1px)" }}
+        paint={{ background: "radial-gradient(circle, rgba(254,215,170,0.5), transparent 70%)", filter: "blur(1px)" }}
         animate={{ opacity: [0.2, 0.6, 0.2], scale: [1, 1.4, 1] }}
-        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        transition={{ duration: 9, ease: "easeInOut", delay: 1.5 }}
       />
     </>
   );
 }
-
 
 function ClearNightLayer() {
   const stars = useMemo(
@@ -209,33 +205,36 @@ function ClearNightLayer() {
         duration: 1.4,
         cycle: 22 + i * 5,
 
-
         trailAngle: -21,
       })),
     [],
   );
   return (
     <>
-      <motion.div
+      <Loop
         className="absolute top-[-30%] left-[5%] w-[75%] h-[140%]"
         style={{
+          mixBlendMode: "screen",
+        }}
+        paint={{
           background:
             "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(99,102,241,0.22) 0%, rgba(139,92,246,0.08) 40%, transparent 70%)",
           filter: "blur(12px)",
-          mixBlendMode: "screen",
         }}
         animate={{ opacity: [0.7, 1, 0.7], x: [0, 8, -4, 0] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 14, ease: "easeInOut" }}
       />
-      <motion.div
+      <Loop
         className="absolute top-[20%] right-[10%] w-[50%] h-[80%]"
         style={{
-          background: "radial-gradient(ellipse, rgba(167,139,250,0.14) 0%, transparent 70%)",
-          filter: "blur(15px)",
           mixBlendMode: "screen",
         }}
+        paint={{
+          background: "radial-gradient(ellipse, rgba(167,139,250,0.14) 0%, transparent 70%)",
+          filter: "blur(15px)",
+        }}
         animate={{ opacity: [0.5, 0.9, 0.5], scale: [1, 1.08, 1] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+        transition={{ duration: 18, ease: "easeInOut", delay: 3 }}
       />
       <div
         className="absolute"
@@ -251,7 +250,7 @@ function ClearNightLayer() {
         }}
       />
       {stars.map((st, i) => (
-        <motion.div
+        <Loop
           key={i}
           className="absolute rounded-full"
           style={{
@@ -265,24 +264,21 @@ function ClearNightLayer() {
               : "0 0 3px rgba(226,232,240,0.6)",
           }}
           animate={{ opacity: [0.15, 1, 0.15], scale: [0.9, 1.15, 0.9] }}
-          transition={{ duration: st.d, repeat: Infinity, ease: "easeInOut", delay: st.delay }}
+          transition={{ duration: st.d, ease: "easeInOut", delay: st.delay }}
         />
       ))}
       {shootingStars.map((sh, i) => (
-        <motion.div
+        <Loop
           key={i}
           className="absolute"
           style={{ left: `${sh.startX}%`, top: `${sh.startY}%` }}
-          initial={{ opacity: 0, x: 0, y: 0 }}
           animate={{
-
             x: [0, -27, -126, -180],
             y: [0, 10, 49, 70],
             opacity: [0, 1, 1, 0],
           }}
           transition={{
             duration: sh.duration,
-            repeat: Infinity,
             repeatDelay: sh.cycle,
             ease: "easeOut",
             delay: sh.delay,
@@ -303,25 +299,24 @@ function ClearNightLayer() {
               borderRadius: 1,
             }}
           />
-        </motion.div>
+        </Loop>
       ))}
     </>
   );
 }
 
-
 function PartlyCloudyDayLayer() {
   return (
     <>
-      <motion.div
+      <Loop
         className="absolute top-[-30%] right-[-15%] w-[60%] h-[150%] rounded-full"
-        style={{
+        paint={{
           background:
             "radial-gradient(circle, rgba(251,191,36,0.20) 0%, rgba(251,146,60,0.05) 45%, transparent 70%)",
           filter: "blur(8px)",
         }}
         animate={{ opacity: [0.7, 1, 0.7] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 12, ease: "easeInOut" }}
       />
       <DriftingCloud top="8%" left="-40%" width="55%" duration={70} delay={0} blur={3} opacity={0.6} kind="cumulus" tint="rgba(220,230,245,0.8)" shadow="rgba(0,0,0,0.2)" />
       <DriftingCloud top="35%" left="-30%" width="42%" duration={55} delay={8} blur={1.5} opacity={0.75} kind="cumulus" tint="rgba(230,240,250,0.9)" shadow="rgba(0,0,0,0.15)" />
@@ -333,15 +328,15 @@ function PartlyCloudyDayLayer() {
 function PartlyCloudyNightLayer() {
   return (
     <>
-      <motion.div
+      <Loop
         className="absolute top-[-20%] left-[15%] w-[60%] h-[100%]"
-        style={{
+        paint={{
           background:
             "radial-gradient(ellipse, rgba(99,102,241,0.15) 0%, transparent 65%)",
           filter: "blur(10px)",
         }}
         animate={{ opacity: [0.6, 0.9, 0.6] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 14, ease: "easeInOut" }}
       />
       {Array.from({ length: 14 }, (_, i) => ({
         x: (i * 31.7) % 100,
@@ -350,7 +345,7 @@ function PartlyCloudyNightLayer() {
         d: 1.5 + ((i * 13) % 4) * 0.7,
         delay: (i * 0.21) % 4,
       })).map((st, i) => (
-        <motion.div
+        <Loop
           key={i}
           className="absolute rounded-full"
           style={{
@@ -362,7 +357,7 @@ function PartlyCloudyNightLayer() {
             boxShadow: "0 0 3px rgba(226,232,240,0.6)",
           }}
           animate={{ opacity: [0.15, 0.9, 0.15] }}
-          transition={{ duration: st.d, repeat: Infinity, ease: "easeInOut", delay: st.delay }}
+          transition={{ duration: st.d, ease: "easeInOut", delay: st.delay }}
         />
       ))}
       <DriftingCloud top="20%" left="-35%" width="48%" duration={75} delay={0} blur={3} opacity={0.55} kind="cumulus" tint="rgba(70,80,110,0.85)" shadow="rgba(0,0,0,0.5)" />
@@ -370,7 +365,6 @@ function PartlyCloudyNightLayer() {
     </>
   );
 }
-
 
 function OvercastLayer() {
   return (
@@ -384,138 +378,154 @@ function OvercastLayer() {
         }}
       />
 
-      <motion.div
+      <Loop
         className="absolute"
         style={{
           top: "-15%",
           right: "8%",
           width: "55%",
           height: "90%",
+          mixBlendMode: "screen",
+        }}
+        paint={{
           background:
             "radial-gradient(ellipse, rgba(254,249,231,0.40) 0%, rgba(254,243,199,0.18) 30%, transparent 60%)",
           filter: "blur(22px)",
-          mixBlendMode: "screen",
         }}
         animate={{ opacity: [0.55, 0.9, 0.55], x: [0, 22, 0], scale: [1, 1.08, 1] }}
-        transition={{ duration: 38, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 38, ease: "easeInOut" }}
       />
 
-      <motion.div
+      <Loop
         className="absolute"
         style={{
           top: "20%",
           left: "10%",
           width: "35%",
           height: "60%",
+          mixBlendMode: "screen",
+        }}
+        paint={{
           background:
             "radial-gradient(ellipse, rgba(220,230,245,0.30) 0%, transparent 65%)",
           filter: "blur(28px)",
-          mixBlendMode: "screen",
         }}
         animate={{ opacity: [0.4, 0.7, 0.4], x: [0, -16, 0] }}
-        transition={{ duration: 55, repeat: Infinity, ease: "easeInOut", delay: 12 }}
+        transition={{ duration: 55, ease: "easeInOut", delay: 12 }}
       />
 
-      <motion.div
+      <Loop
         className="absolute"
         style={{
           top: "-25%",
           left: "-40%",
           width: "90%",
           height: "100%",
+        }}
+        paint={{
           background:
             "radial-gradient(ellipse 55% 45% at 50% 50%, rgba(45,55,75,0.55) 0%, rgba(60,72,95,0.30) 40%, transparent 70%)",
           filter: "blur(25px)",
         }}
         animate={{ x: ["0%", "180%"], opacity: [0.7, 0.9, 0.7] }}
         transition={{
-          x: { duration: 95, repeat: Infinity, ease: "linear" },
-          opacity: { duration: 18, repeat: Infinity, ease: "easeInOut" },
+          x: { duration: 95, ease: "linear" },
+          opacity: { duration: 18, ease: "easeInOut" },
         }}
       />
-      <motion.div
+      <Loop
         className="absolute"
         style={{
           top: "15%",
           left: "-60%",
           width: "100%",
           height: "85%",
+        }}
+        paint={{
           background:
             "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(55,68,92,0.50) 0%, rgba(70,82,105,0.25) 45%, transparent 72%)",
           filter: "blur(30px)",
         }}
         animate={{ x: ["0%", "180%"], opacity: [0.6, 0.85, 0.6] }}
         transition={{
-          x: { duration: 130, repeat: Infinity, ease: "linear", delay: 8 },
-          opacity: { duration: 22, repeat: Infinity, ease: "easeInOut", delay: 5 },
+          x: { duration: 130, ease: "linear", delay: 8 },
+          opacity: { duration: 22, ease: "easeInOut", delay: 5 },
         }}
       />
-      <motion.div
+      <Loop
         className="absolute"
         style={{
           top: "35%",
           left: "-50%",
           width: "85%",
           height: "75%",
+        }}
+        paint={{
           background:
             "radial-gradient(ellipse 50% 45% at 50% 50%, rgba(40,52,75,0.55) 0%, transparent 68%)",
           filter: "blur(28px)",
         }}
         animate={{ x: ["0%", "180%"], opacity: [0.65, 0.85, 0.65] }}
         transition={{
-          x: { duration: 110, repeat: Infinity, ease: "linear", delay: 25 },
-          opacity: { duration: 20, repeat: Infinity, ease: "easeInOut", delay: 10 },
+          x: { duration: 110, ease: "linear", delay: 25 },
+          opacity: { duration: 20, ease: "easeInOut", delay: 10 },
         }}
       />
 
-      <motion.div
+      <Loop
         className="absolute"
         style={{
           top: "5%",
           left: "-30%",
           width: "70%",
           height: "70%",
+          mixBlendMode: "screen",
+        }}
+        paint={{
           background:
             "radial-gradient(ellipse 50% 40% at 50% 50%, rgba(220,232,248,0.45) 0%, rgba(200,215,235,0.20) 40%, transparent 70%)",
           filter: "blur(20px)",
-          mixBlendMode: "screen",
         }}
         animate={{ x: ["0%", "180%"], opacity: [0.5, 0.75, 0.5] }}
         transition={{
-          x: { duration: 100, repeat: Infinity, ease: "linear", delay: 15 },
-          opacity: { duration: 24, repeat: Infinity, ease: "easeInOut", delay: 8 },
+          x: { duration: 100, ease: "linear", delay: 15 },
+          opacity: { duration: 24, ease: "easeInOut", delay: 8 },
         }}
       />
-      <motion.div
+      <Loop
         className="absolute"
         style={{
           top: "40%",
           left: "-40%",
           width: "80%",
           height: "60%",
+          mixBlendMode: "screen",
+        }}
+        paint={{
           background:
             "radial-gradient(ellipse 50% 45% at 50% 50%, rgba(210,222,240,0.40) 0%, transparent 70%)",
           filter: "blur(22px)",
-          mixBlendMode: "screen",
         }}
         animate={{ x: ["0%", "180%"], opacity: [0.4, 0.7, 0.4] }}
         transition={{
-          x: { duration: 140, repeat: Infinity, ease: "linear", delay: 30 },
-          opacity: { duration: 28, repeat: Infinity, ease: "easeInOut", delay: 18 },
+          x: { duration: 140, ease: "linear", delay: 30 },
+          opacity: { duration: 28, ease: "easeInOut", delay: 18 },
         }}
       />
 
-      <motion.div
+      <Loop
         className="absolute left-0 right-0"
         style={{
           top: "45%",
           height: "12%",
+        }}
+        paint={{
           background:
             "linear-gradient(180deg, transparent, rgba(50,62,85,0.25) 50%, transparent)",
           filter: "blur(8px)",
         }}
         animate={{ opacity: [0.5, 0.9, 0.5], y: [0, 5, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 20, ease: "easeInOut" }}
       />
 
       <div
@@ -527,7 +537,6 @@ function OvercastLayer() {
     </>
   );
 }
-
 
 function FogLayer() {
   return (
@@ -547,7 +556,7 @@ function FogLayer() {
         { y: 65, h: 32, op: 0.4, d: 30, delay: 4 },
         { y: 80, h: 28, op: 0.3, d: 36, delay: 3 },
       ].map((band, i) => (
-        <motion.div
+        <Loop
           key={i}
           className="absolute"
           style={{
@@ -555,17 +564,18 @@ function FogLayer() {
             left: "-30%",
             width: "160%",
             height: `${band.h}%`,
+          }}
+          paint={{
             background: `linear-gradient(180deg, transparent, rgba(203,213,225,${band.op * 0.7}) 50%, transparent)`,
             filter: "blur(8px)",
           }}
           animate={{ x: ["-8%", "8%", "-8%"], opacity: [band.op * 0.6, band.op, band.op * 0.6] }}
-          transition={{ duration: band.d, repeat: Infinity, ease: "easeInOut", delay: band.delay }}
+          transition={{ duration: band.d, ease: "easeInOut", delay: band.delay }}
         />
       ))}
     </>
   );
 }
-
 
 function DrizzleLayer() {
   const drops = useMemo(
@@ -590,7 +600,7 @@ function DrizzleLayer() {
       <DriftingCloud top="-15%" left="-40%" width="70%" duration={80} delay={0} blur={5} opacity={0.55} kind="stratus" tint="rgba(140,155,175,0.85)" />
       <DriftingCloud top="0%" left="-45%" width="80%" duration={95} delay={3} blur={3} opacity={0.5} kind="stratus" tint="rgba(130,145,165,0.8)" />
       {drops.map((d, i) => (
-        <motion.div
+        <Loop
           key={i}
           className="absolute"
           style={{
@@ -603,7 +613,6 @@ function DrizzleLayer() {
           animate={{ y: ["0%", "1400%"], opacity: [0, 1, 1, 0] }}
           transition={{
             duration: d.duration,
-            repeat: Infinity,
             ease: "linear",
             delay: d.delay,
             times: [0, 0.1, 0.9, 1],
@@ -613,7 +622,6 @@ function DrizzleLayer() {
     </>
   );
 }
-
 
 function RainLayer() {
   return (
@@ -633,7 +641,6 @@ function RainLayer() {
   );
 }
 
-
 function ShowersLayer() {
   return (
     <>
@@ -644,13 +651,13 @@ function ShowersLayer() {
             "linear-gradient(180deg, rgba(30,41,59,0.40) 0%, rgba(15,23,42,0.25) 100%)",
         }}
       />
-      <motion.div
+      <Loop
         className="absolute inset-0"
         style={{
           background: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(56,189,248,0.12) 0%, transparent 70%)",
         }}
         animate={{ opacity: [0.6, 1, 0.6] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 5, ease: "easeInOut" }}
       />
       <DriftingCloud top="-25%" left="-50%" width="95%" duration={50} delay={0} blur={4} opacity={0.85} kind="storm" tint="rgba(70,85,110,0.95)" shadow="rgba(0,0,0,0.5)" />
       <DriftingCloud top="-10%" left="-60%" width="100%" duration={65} delay={5} blur={2} opacity={0.75} kind="storm" tint="rgba(85,95,120,0.9)" />
@@ -663,7 +670,6 @@ function ShowersLayer() {
     </>
   );
 }
-
 
 function FreezingRainLayer() {
   return (
@@ -683,7 +689,7 @@ function FreezingRainLayer() {
         delay: (i * 0.21) % 2,
         duration: 1.8 + ((i * 7) % 4) * 0.3,
       })).map((p, i) => (
-        <motion.div
+        <Loop
           key={i}
           className="absolute rounded-full"
           style={{
@@ -695,13 +701,12 @@ function FreezingRainLayer() {
             boxShadow: "0 0 3px rgba(186,230,253,0.6)",
           }}
           animate={{ y: ["0%", "1400%"] }}
-          transition={{ duration: p.duration, repeat: Infinity, ease: "linear", delay: p.delay }}
+          transition={{ duration: p.duration, ease: "linear", delay: p.delay }}
         />
       ))}
     </>
   );
 }
-
 
 function SnowLayer() {
   const layers = useMemo(
@@ -734,13 +739,9 @@ function SnowLayer() {
       />
       <DriftingCloud top="-20%" left="-45%" width="80%" duration={90} delay={0} blur={6} opacity={0.55} kind="stratus" tint="rgba(180,200,220,0.85)" />
       {layers.map((layer, li) => (
-        <div
-          key={li}
-          className="absolute inset-0"
-          style={{ filter: layer.blur ? `blur(${layer.blur}px)` : undefined }}
-        >
+        <div key={li} className="absolute inset-0">
           {layer.flakes.map((f, i) => (
-            <motion.div
+            <Loop
               key={i}
               className="absolute"
               style={{
@@ -755,13 +756,15 @@ function SnowLayer() {
                 rotate: f.rotateDir * 360,
               }}
               transition={{
-                y: { duration: f.duration, repeat: Infinity, ease: "linear", delay: f.delay },
-                x: { duration: f.duration / 2, repeat: Infinity, ease: "easeInOut", delay: f.delay },
-                rotate: { duration: 8, repeat: Infinity, ease: "linear", delay: f.delay },
+                y: { duration: f.duration, ease: "linear", delay: f.delay },
+                x: { duration: f.duration / 2, ease: "easeInOut", delay: f.delay },
+                rotate: { duration: 8, ease: "linear", delay: f.delay },
               }}
             >
-              <Snowflake size={layer.size} opacity={layer.opacity} variant={f.shape} />
-            </motion.div>
+              <div style={{ filter: layer.blur ? `blur(${layer.blur}px)` : undefined }}>
+                <Snowflake size={layer.size} opacity={layer.opacity} variant={f.shape} />
+              </div>
+            </Loop>
           ))}
         </div>
       ))}
@@ -773,7 +776,6 @@ function Snowflake({ size, opacity, variant }: { size: number; opacity: number; 
   const color = `rgba(241,250,254,${opacity})`;
   const glow = size >= 4 ? "drop-shadow(0 0 3px rgba(186,230,253,0.5))" : undefined;
   if (variant === 0) {
-
     return (
       <svg width={size * 3} height={size * 3} viewBox="0 0 30 30" style={{ filter: glow, transform: "translate(-33%, -33%)" }}>
         {[0, 60, 120].map((deg) => (
@@ -784,7 +786,6 @@ function Snowflake({ size, opacity, variant }: { size: number; opacity: number; 
     );
   }
   if (variant === 1) {
-
     return (
       <svg width={size * 3} height={size * 3} viewBox="0 0 30 30" style={{ filter: glow, transform: "translate(-33%, -33%)" }}>
         {[0, 60, 120, 180, 240, 300].map((deg) => {
@@ -809,7 +810,6 @@ function Snowflake({ size, opacity, variant }: { size: number; opacity: number; 
   );
 }
 
-
 function SnowGrainsLayer() {
   const grains = useMemo(
     () =>
@@ -832,7 +832,7 @@ function SnowGrainsLayer() {
       />
       <DriftingCloud top="-15%" left="-45%" width="80%" duration={75} delay={0} blur={5} opacity={0.6} kind="stratus" tint="rgba(180,195,215,0.85)" />
       {grains.map((g, i) => (
-        <motion.div
+        <Loop
           key={i}
           className="absolute rounded-full"
           style={{
@@ -844,15 +844,14 @@ function SnowGrainsLayer() {
           }}
           animate={{ y: ["0%", "1400%"], x: [0, g.drift, 0] }}
           transition={{
-            y: { duration: g.duration, repeat: Infinity, ease: "linear", delay: g.delay },
-            x: { duration: g.duration / 3, repeat: Infinity, ease: "easeInOut", delay: g.delay },
+            y: { duration: g.duration, ease: "linear", delay: g.delay },
+            x: { duration: g.duration / 3, ease: "easeInOut", delay: g.delay },
           }}
         />
       ))}
     </>
   );
 }
-
 
 function ThunderstormLayer() {
   return (
@@ -873,7 +872,6 @@ function ThunderstormLayer() {
   );
 }
 
-
 function HailStormLayer() {
   return (
     <>
@@ -893,7 +891,7 @@ function HailStormLayer() {
         duration: 1.2 + ((i * 5) % 4) * 0.25,
         size: 3 + (i % 3) * 0.8,
       })).map((h, i) => (
-        <motion.div
+        <Loop
           key={i}
           className="absolute rounded-full"
           style={{
@@ -906,8 +904,8 @@ function HailStormLayer() {
           }}
           animate={{ y: ["0%", "1400%"], rotate: 360 }}
           transition={{
-            y: { duration: h.duration, repeat: Infinity, ease: "linear", delay: h.delay },
-            rotate: { duration: 4, repeat: Infinity, ease: "linear", delay: h.delay },
+            y: { duration: h.duration, ease: "linear", delay: h.delay },
+            rotate: { duration: 4, ease: "linear", delay: h.delay },
           }}
         />
       ))}
@@ -915,7 +913,6 @@ function HailStormLayer() {
     </>
   );
 }
-
 
 interface DriftingCloudProps {
   top: string;
@@ -930,26 +927,26 @@ interface DriftingCloudProps {
   shadow?: string;
 }
 function DriftingCloud({ top, left, width, duration, delay, blur, opacity, kind, tint }: DriftingCloudProps) {
-
   const height = kind === "stratus" ? "32%" : "55%";
   const { a } = parseRgba(tint);
   return (
-    <motion.div
+    <Loop
       className="absolute"
       style={{
         top, left, width, height,
         opacity: opacity * a,
+      }}
+      paint={{
         backgroundImage: `url(${meteoconCloud()})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "100% 100%",
         filter: `${tintFilter(tint)}${blur ? ` blur(${blur}px)` : ""}`,
       }}
       animate={{ x: ["0%", "180%"] }}
-      transition={{ duration, repeat: Infinity, ease: "linear", delay }}
+      transition={{ duration, ease: "linear", delay }}
     />
   );
 }
-
 
 interface RainParticlesProps {
   density: number;
@@ -972,9 +969,9 @@ function RainParticles({ density, skew, speed, length, thickness, opacity, blur,
     [density, speed],
   );
   return (
-    <div className="absolute inset-0" style={{ filter: blur ? `blur(${blur}px)` : undefined }}>
+    <div className="absolute inset-0">
       {drops.map((d, i) => (
-        <motion.div
+        <Loop
           key={i}
           className="absolute"
           style={{
@@ -982,17 +979,19 @@ function RainParticles({ density, skew, speed, length, thickness, opacity, blur,
             top: "-12%",
             width: thickness,
             height: length,
+          }}
+          paint={{
             background: `linear-gradient(180deg, transparent, ${color.replace("1)", `${opacity})`)})`,
             transform: `skewX(${skew}deg)`,
+            filter: blur ? `blur(${blur}px)` : undefined,
           }}
           animate={{ y: ["0%", "1400%"] }}
-          transition={{ duration: d.duration, repeat: Infinity, ease: "linear", delay: d.delay }}
+          transition={{ duration: d.duration, ease: "linear", delay: d.delay }}
         />
       ))}
     </div>
   );
 }
-
 
 function SplashDots() {
   const splashes = useMemo(
@@ -1007,7 +1006,7 @@ function SplashDots() {
   return (
     <>
       {splashes.map((s, i) => (
-        <motion.div
+        <Loop
           key={i}
           className="absolute"
           style={{
@@ -1019,76 +1018,72 @@ function SplashDots() {
             background: "rgba(186,230,253,0.6)",
           }}
           animate={{ scale: [0.3, 1.6, 0.3], opacity: [0, 0.7, 0] }}
-          transition={{ duration: s.duration, repeat: Infinity, repeatDelay: 1.5 + i * 0.1, delay: s.delay, ease: "easeOut" }}
+          transition={{ duration: s.duration, repeatDelay: 1.5 + i * 0.1, delay: s.delay, ease: "easeOut" }}
         />
       ))}
     </>
   );
 }
 
-
 function LightningBolt() {
   return (
     <>
-      <motion.svg
-        className="absolute top-[5%] left-[35%]"
-        width="30%" height="90%" viewBox="0 0 60 200"
+      <Loop
+        className="absolute top-[5%] left-[35%] w-[30%] h-[90%]"
         style={{ mixBlendMode: "screen" }}
-        initial={{ opacity: 0 }}
         animate={{ opacity: [0, 0, 0, 1, 0, 0.6, 0, 0, 0, 0, 0] }}
         transition={{
           duration: 6,
-          repeat: Infinity,
           ease: "linear",
           times: [0, 0.4, 0.42, 0.45, 0.48, 0.51, 0.54, 0.6, 0.8, 0.95, 1],
         }}
       >
-        <defs>
-          <filter id="bolt-glow">
-            <feGaussianBlur stdDeviation="2.5" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-        <path
-          d="M30 0 L24 60 L34 60 L18 130 L30 130 L12 200"
-          stroke="#fef3c7"
-          strokeWidth="2.5"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          filter="url(#bolt-glow)"
-        />
-        <path
-          d="M34 60 L42 90 L36 90 L46 120"
-          stroke="#fde68a"
-          strokeWidth="1.5"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.8"
-          filter="url(#bolt-glow)"
-        />
-      </motion.svg>
-      <motion.div
+        <svg width="100%" height="100%" viewBox="0 0 60 200">
+          <defs>
+            <filter id="bolt-glow">
+              <feGaussianBlur stdDeviation="2.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <path
+            d="M30 0 L24 60 L34 60 L18 130 L30 130 L12 200"
+            stroke="#fef3c7"
+            strokeWidth="2.5"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            filter="url(#bolt-glow)"
+          />
+          <path
+            d="M34 60 L42 90 L36 90 L46 120"
+            stroke="#fde68a"
+            strokeWidth="1.5"
+            fill="none"
+            strokeLinecap="round"
+            opacity="0.8"
+            filter="url(#bolt-glow)"
+          />
+        </svg>
+      </Loop>
+      <Loop
         className="absolute inset-0"
         style={{ background: "rgba(254,243,199,1)" }}
         animate={{ opacity: [0, 0, 0, 0.18, 0, 0.08, 0, 0, 0, 0, 0] }}
         transition={{
           duration: 6,
-          repeat: Infinity,
           ease: "linear",
           times: [0, 0.4, 0.42, 0.45, 0.48, 0.51, 0.54, 0.6, 0.8, 0.95, 1],
         }}
       />
-      <motion.div
+      <Loop
         className="absolute left-0 right-0 bottom-0 h-[40%]"
         style={{ background: "linear-gradient(0deg, rgba(254,243,199,0.18), transparent)" }}
         animate={{ opacity: [0, 0, 0, 1, 0, 0.4, 0, 0, 0, 0, 0] }}
         transition={{
           duration: 6,
-          repeat: Infinity,
           ease: "linear",
           times: [0, 0.4, 0.42, 0.45, 0.48, 0.51, 0.54, 0.6, 0.8, 0.95, 1],
         }}

@@ -80,7 +80,7 @@ const API_LIST: { host: string; purposeKey: string }[] = [
   { host: "api.weather.gov",                purposeKey: "settings.apiWeatherGov" },
   { host: "feeds.meteoalarm.org",           purposeKey: "settings.apiMeteoAlarm" },
   { host: "api.rainviewer.com",             purposeKey: "settings.apiRainViewer" },
-  { host: "cartodb-basemaps.fastly.net",    purposeKey: "settings.apiCartoDB" },
+  { host: "services.arcgisonline.com",      purposeKey: "settings.apiEsri" },
 ];
 
 export function SettingsPanel({ onClose }: SettingsPanelProps) {
@@ -529,7 +529,6 @@ function CinematicIntroRow() {
 }
 
 function GaugeMiniIcon() {
-
   return (
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
       <path d="M2 9a5 5 0 0110 0" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />

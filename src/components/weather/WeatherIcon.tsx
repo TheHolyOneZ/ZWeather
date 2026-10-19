@@ -8,13 +8,13 @@ interface WeatherIconProps {
   isDay?: boolean;
   size?: number;
   className?: string;
+  idle?: boolean;
 }
 
-export function WeatherIcon({ code, isDay = true, size = 24, className = "" }: WeatherIconProps) {
+export function WeatherIcon({ code, isDay = true, size = 24, className = "", idle = false }: WeatherIconProps) {
   const name = wmoToMeteocon(code, isDay);
   const src = meteoconUrl(name);
   const animated = useSettingsStore((s) => s.settings.animated_icons);
-
 
   const stripRotate = name.includes("night") || name.startsWith("moon");
   return (
@@ -24,10 +24,10 @@ export function WeatherIcon({ code, isDay = true, size = 24, className = "" }: W
       className={className}
       animated={animated}
       stripRotate={stripRotate}
+      idle={idle}
     />
   );
 }
-
 
 export const MeteoconImg = memo(function MeteoconImg({
   src,
@@ -35,15 +35,16 @@ export const MeteoconImg = memo(function MeteoconImg({
   className = "",
   animated,
   stripRotate = false,
+  idle = false,
 }: {
   src: string;
   size: number;
   className?: string;
   animated: boolean;
   stripRotate?: boolean;
+  idle?: boolean;
 }) {
   const ref = useRef<HTMLSpanElement | null>(null);
-
 
   const lastHtml = useRef<string>("");
 
@@ -68,12 +69,12 @@ export const MeteoconImg = memo(function MeteoconImg({
     <span
       ref={ref}
       aria-hidden
+      data-idle={idle ? "" : undefined}
       className={`meteocon ${className}`}
       style={{ width: size, height: size, flexShrink: 0, display: "block" }}
     />
   );
 });
-
 
 export function tempToColor(celsius: number): string {
   const light = typeof document !== "undefined"

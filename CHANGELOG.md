@@ -5,6 +5,53 @@ All notable changes to ZWeather are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] — 2026-10-19
+
+A performance and weather-map release. No data-format changes, so upgrading in
+place keeps every location and preference.
+
+### Fixed
+
+- **The weather map showed "API KEY REQUIRED" everywhere.** CARTO's base map now
+  answers every request with a watermark tile; installs that still showed a map
+  were displaying tiles from their 30-day cache and would have broken the same
+  way. The map now uses Esri's key-less World Dark Gray canvas and its label
+  layer, with the required attribution in the corner.
+- **Rain radar, wind, clouds and temperature never loaded in installed builds.**
+  The app's content security policy blocked the requests to RainViewer and
+  Open-Meteo, so the map sat on "Loading" forever. Both hosts are now allowed.
+- **Radar tiles turned into "Zoom Level Not Supported" boxes when zoomed in.**
+  RainViewer only serves radar up to zoom 7; deeper zoom levels now upscale those
+  tiles instead.
+- **Cloud and temperature overlays stopped short of the bottom of the map**
+  after switching away from the rain layer, and they were drawn on top of the
+  map's own controls.
+- **Map layers could spin on "Loading" forever** when Open-Meteo was busy. Busy
+  (503) answers are now retried like rate limits, requests time out after 20 s,
+  and the map says the weather service is busy while it keeps retrying.
+- **The dashboard could briefly show 0°, 0 % humidity, 0 hPa and no sunrise.**
+  When Open-Meteo answered with an error (rate limit, overload), every missing
+  field was read as zero and displayed, and cached for the tray, as if it were
+  real weather. Errors are now reported as errors, so the last good data stays
+  on screen until the next successful refresh.
+- **The dashboard was sluggish and used a lot of CPU, especially on Linux and on
+  high-refresh-rate screens.** Measured on Linux (WebKitGTK, 165 Hz), the
+  dashboard used about 1.4 CPU cores constantly, with the renderer's compositor
+  maxed out and dropping frames. It now uses about 0.15–0.2 of a core while you
+  are looking at it and almost nothing otherwise:
+  - Decorative animations (hero weather scene, moon, alert pulse) pause while the
+    window is in the background and while a dialog, the settings panel or the map
+    covers the dashboard.
+  - Those animations now run as CSS animations on the compositor instead of
+    being driven from JavaScript every frame, and their blur filters are drawn
+    once instead of on every frame.
+  - Cards no longer apply a backdrop blur. It was invisible on the smooth
+    background behind them but was recomputed on every frame.
+  - Weather icons in the 24-hour strip, the 10-day list and the location tabs
+    animate while you hover their row; the hero icon and the current hour still
+    animate all the time. Thirty-odd SVG animations running together were the
+    single biggest cost.
+
 ## [0.1.2] — 2026-10-06
 
 A tray bug-fix release, prompted by the report in
@@ -125,6 +172,7 @@ Initial public release.
 - Five languages: English, German, French, Spanish, Italian.
 - Fully local storage — no account, no telemetry, no cloud sync.
 
+[0.1.3]: https://github.com/TheHolyOneZ/ZWeather/releases/tag/v0.1.3
 [0.1.2]: https://github.com/TheHolyOneZ/ZWeather/releases/tag/v0.1.2
 [0.1.1]: https://github.com/TheHolyOneZ/ZWeather/releases/tag/v0.1.1
 [0.1.0]: https://github.com/TheHolyOneZ/ZWeather/releases/tag/v0.1.0

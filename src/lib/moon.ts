@@ -1,9 +1,6 @@
-
-
 const RAD = Math.PI / 180;
 const SYNODIC_MONTH = 29.530588853;
 const MOON_RADIUS_KM = 1737.4;
-
 
 const NEW_MOON_REF_MS = Date.UTC(2000, 0, 6, 18, 14, 0);
 
@@ -15,13 +12,11 @@ function daysSinceJ2000(date: Date): number {
   return toJulian(date) - 2451545.0;
 }
 
-
 export type MoonPhaseKey =
   | "new" | "waxCrescent" | "firstQ" | "waxGibbous"
   | "full" | "wanGibbous" | "lastQ" | "wanCrescent";
 
 export interface MoonPhaseInfo {
-
   phase: number;
   labelKey: `moon.${MoonPhaseKey}`;
 
@@ -50,9 +45,7 @@ export function getMoonPhase(date: Date = new Date()): MoonPhaseInfo {
   return { phase, labelKey, illumination, ageDays };
 }
 
-
 interface MoonPosition {
-
   ra: number;
 
   dec: number;
@@ -65,11 +58,9 @@ interface MoonPosition {
 function moonPosition(date: Date): MoonPosition {
   const d = daysSinceJ2000(date);
 
-
   const L = 218.316 + 13.176396 * d;
   const M = 134.963 + 13.064993 * d;
   const F = 93.272 + 13.229350 * d;
-
 
   const lambda = L + 6.289 * Math.sin(M * RAD);
   const beta = 5.128 * Math.sin(F * RAD);
@@ -92,7 +83,6 @@ function moonPosition(date: Date): MoonPosition {
 }
 
 export interface MoonGeometry {
-
   distance: number;
 
   angularDiameterArcmin: number;
@@ -118,14 +108,12 @@ export function getMoonGeometry(date: Date = new Date()): MoonGeometry {
   };
 }
 
-
 function gmst(date: Date): number {
   const d = daysSinceJ2000(date);
   const T = d / 36525;
   const deg = 280.46061837 + 360.98564736629 * d + 0.000387933 * T * T - (T * T * T) / 38710000;
   return ((deg % 360) + 360) * RAD;
 }
-
 
 export function moonAltitude(date: Date, lat: number, lon: number): number {
   const pos = moonPosition(date);
@@ -135,7 +123,6 @@ export function moonAltitude(date: Date, lat: number, lon: number): number {
   const sinAlt = Math.sin(phi) * Math.sin(pos.dec) + Math.cos(phi) * Math.cos(pos.dec) * Math.cos(H);
   return Math.asin(sinAlt) / RAD;
 }
-
 
 export interface MoonRiseSet {
   rise?: number;
@@ -189,14 +176,11 @@ function refineCrossing(a: Date, b: Date, lat: number, lon: number): number {
   return (lo + hi) / 2;
 }
 
-
 export interface PrincipalPhase {
-
   time: number;
   kind: "new" | "firstQ" | "full" | "lastQ";
   labelKey: `moon.${"new" | "firstQ" | "full" | "lastQ"}`;
 }
-
 
 export function upcomingPhases(date: Date = new Date(), count = 4): PrincipalPhase[] {
   const out: PrincipalPhase[] = [];
@@ -213,7 +197,6 @@ export function upcomingPhases(date: Date = new Date(), count = 4): PrincipalPha
   }
   return out;
 }
-
 
 export function moonZodiac(date: Date = new Date()): { signKey: string; symbol: string; lon: number } {
   const { eclipticLon } = getMoonGeometry(date);
@@ -234,7 +217,6 @@ export function moonZodiac(date: Date = new Date()): { signKey: string; symbol: 
   ];
   return { ...signs[idx], lon: eclipticLon };
 }
-
 
 export function formatDistance(km: number): string {
   return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(Math.round(km));

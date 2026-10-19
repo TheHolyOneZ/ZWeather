@@ -8,7 +8,7 @@ pub struct AirQualityFetcher {
 impl AirQualityFetcher {
     pub fn new() -> Self {
         let client = reqwest::Client::builder()
-            .user_agent("ZWeather/0.1.0 (https://github.com/TheHolyOneZ/ZWeather)")
+            .user_agent("ZWeather/0.1.3 (https://github.com/TheHolyOneZ/ZWeather)")
             .build()
             .expect("failed to build HTTP client");
         Self { client }
@@ -31,7 +31,7 @@ impl AirQualityFetcher {
              &forecast_days=5"
         );
 
-        let resp: serde_json::Value = self.client.get(&url).send().await?.json().await?;
+        let resp = crate::weather_fetcher::get_open_meteo(&self.client, &url).await?;
 
         let utc_offset = resp["utc_offset_seconds"].as_i64().unwrap_or(0);
         let c = &resp["current"];
@@ -158,7 +158,6 @@ fn aggregate_daily(hourly: &[AirQualityHourly], h_raw: &serde_json::Value) -> Ve
         })
         .collect()
 }
-
 
 fn dominant_pollutant(pm25: f64, pm10: f64, o3: f64, no2: f64, so2: f64) -> String {
     let pm25_n = pm25 / 25.0;

@@ -1,5 +1,3 @@
-
-
 import L from "leaflet";
 import type { BBox } from "@/lib/openMeteoGrid";
 
@@ -21,7 +19,6 @@ export function sizeOverlayCanvas(canvas: HTMLCanvasElement, map: L.Map) {
   canvas.style.width = `${size.x}px`;
   canvas.style.height = `${size.y}px`;
 }
-
 
 export function safeBounds(map: L.Map): BBox {
   const b = map.getBounds();

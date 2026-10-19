@@ -1,5 +1,3 @@
-
-
 import L from "leaflet";
 import type { GridSample } from "@/lib/openMeteoGrid";
 import { fetchGridSample, latLonToGrid, sample } from "@/lib/openMeteoGrid";
@@ -18,6 +16,7 @@ const FADE_ALPHA = 0.94;
 const SPEED_SCALE = 0.05;
 const MAX_STEP_PX = 8;
 const REFRESH_DEBOUNCE_MS = 1200;
+const RETRY_MS = 15_000;
 
 interface Particle {
   x: number;
@@ -85,7 +84,6 @@ export function createWindLayer(): WeatherLayer {
       ctx.lineCap = "round";
 
       for (const p of particles) {
-
         if (
           !Number.isFinite(p.x) || !Number.isFinite(p.y) ||
           p.x < 0 || p.y < 0 || p.x > W || p.y > H ||
@@ -116,7 +114,6 @@ export function createWindLayer(): WeatherLayer {
 
         const speed = Math.hypot(u, v);
 
-
         let dx = u * SPEED_SCALE;
         let dy = -v * SPEED_SCALE;
         const stepMag = Math.hypot(dx, dy);
@@ -144,7 +141,6 @@ export function createWindLayer(): WeatherLayer {
         if (p.x < 0 || p.y < 0 || p.x > W || p.y > H) spawnParticle(p);
       }
     } catch {
-
     }
 
     rafId = requestAnimationFrame(step);
@@ -164,13 +160,14 @@ export function createWindLayer(): WeatherLayer {
       grid = next;
       ready = { ready: true, loaded: 1, total: 1 };
       emitReady();
-    } catch {
+    } catch (e) {
       if (isInitial && map) {
-        ready = { ready: false, loaded: 0, total: 1 };
+        ready = { ready: false, loaded: 0, total: 1, error: true };
         emitReady();
       }
+      throw e;
     }
-  }, { debounceMs: REFRESH_DEBOUNCE_MS, urgentMs: 60 });
+  }, { debounceMs: REFRESH_DEBOUNCE_MS, urgentMs: 60, retryMs: RETRY_MS });
 
   const onMove = () => {
     resizeCanvas();
@@ -178,7 +175,6 @@ export function createWindLayer(): WeatherLayer {
   const onMoveEnd = () => {
     if (map && viewEscapedGrid(safeBounds(map), grid)) {
       controller.scheduleUrgent();
-
 
       initParticles();
     } else {

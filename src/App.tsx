@@ -16,8 +16,6 @@ declare global {
 const windowLabel = getCurrentWindow().label;
 
 export default function App() {
-
-
   const [showIntro, setShowIntro] = useState(
     () => windowLabel === "main" && !window.__ZW_REOPENED__ && isIntroEnabled(),
   );

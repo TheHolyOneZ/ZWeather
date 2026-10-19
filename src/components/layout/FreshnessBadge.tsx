@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -24,13 +22,11 @@ export function FreshnessBadge({
     return () => window.clearInterval(id);
   }, []);
 
-
   if (!hasData && !isError) return null;
 
   const ageMs = lastUpdatedMs > 0 ? now - lastUpdatedMs : Number.POSITIVE_INFINITY;
   const offline = isError && !hasData;
   const stale = !offline && (isError || ageMs > refreshIntervalMs * 2);
-
 
   if (!offline && !stale && ageMs < 30_000) return null;
 

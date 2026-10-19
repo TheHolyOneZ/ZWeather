@@ -1,8 +1,5 @@
-
-
 import type L from "leaflet";
 import type { BBox, GridSample } from "@/lib/openMeteoGrid";
-
 
 export function viewportInsideGrid(view: BBox, grid: BBox, marginFrac = 0.0): boolean {
   const dLat = (grid.north - grid.south) * marginFrac;
@@ -15,10 +12,9 @@ export function viewportInsideGrid(view: BBox, grid: BBox, marginFrac = 0.0): bo
   );
 }
 
-
 export function createRefetchController(
   run: () => Promise<void>,
-  opts: { debounceMs: number; urgentMs?: number } = { debounceMs: 1200, urgentMs: 60 },
+  opts: { debounceMs: number; urgentMs?: number; retryMs?: number } = { debounceMs: 1200, urgentMs: 60 },
 ) {
   const urgentMs = opts.urgentMs ?? 60;
   let timer: number | null = null;
@@ -38,19 +34,25 @@ export function createRefetchController(
     timer = null;
     if (cancelled) return;
     if (inFlight) {
-
       pending = true;
       return;
     }
     inFlight = true;
     pending = false;
     pendingUrgent = false;
+    let failed = false;
     Promise.resolve()
       .then(run)
-      .catch(() => {})
+      .catch(() => {
+        failed = true;
+      })
       .finally(() => {
         inFlight = false;
         if (cancelled) return;
+        if (failed && !pending && opts.retryMs) {
+          schedule(opts.retryMs);
+          return;
+        }
         if (pending) {
           pending = false;
 
@@ -87,7 +89,6 @@ export function createRefetchController(
   };
 }
 
-
 export function safeContainerToLatLng(map: L.Map, px: number, py: number): { lat: number; lng: number } | null {
   try {
     const ll = map.containerPointToLatLng([px, py]);
@@ -97,7 +98,6 @@ export function safeContainerToLatLng(map: L.Map, px: number, py: number): { lat
     return null;
   }
 }
-
 
 export function viewEscapedGrid(view: BBox, grid: GridSample | null): boolean {
   if (!grid) return false;

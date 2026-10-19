@@ -237,7 +237,6 @@ function PollutantBar({
 }
 
 function PollenDots({ level }: { level: number }) {
-
   let count = 0;
   if (level >= 1) count = 1;
   if (level >= 20) count = 2;

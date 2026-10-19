@@ -1,7 +1,6 @@
 import { createTileTimelineLayer } from "./rainviewer";
 import type { WeatherLayer } from "./types";
 
-
 const COLOR_SCHEME = 4;
 const SMOOTH = 1;
 const SNOW_OVERLAY = 1;
@@ -14,7 +13,6 @@ export function createPrecipLayer(): WeatherLayer {
       `${host}${path}/256/{z}/{x}/{y}/${COLOR_SCHEME}/${SMOOTH}_${SNOW_OVERLAY}.png`,
     framePickerPast: (d) => d.radar?.past ?? [],
     framePickerFuture: (d) => d.radar?.nowcast ?? [],
-
 
     preloadAll: false,
     legend: {

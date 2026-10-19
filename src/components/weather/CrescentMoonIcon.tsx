@@ -1,6 +1,5 @@
-
-
-import { motion } from "framer-motion";
+import { Loop } from "@/components/ui/Loop";
+import { loopStyle } from "@/lib/ambient";
 import { useSettingsStore } from "@/store/settingsStore";
 
 interface CrescentMoonIconProps {
@@ -11,26 +10,9 @@ interface CrescentMoonIconProps {
 export function CrescentMoonIcon({ size = 72, className }: CrescentMoonIconProps) {
   const animated = useSettingsStore((s) => s.settings.animated_icons);
 
-  const Wrap = animated ? motion.div : "div";
-  const animProps = animated
-    ? {
-        animate: { y: [0, -2, 0, 1.5, 0], rotate: [-3, -1, -4, -2, -3] },
-        transition: { duration: 12, repeat: Infinity, ease: "easeInOut" },
-      }
-    : {};
-
-  return (
-    <Wrap
-      className={className}
-      style={{
-        width: size,
-        height: size,
-        display: "inline-block",
-        filter: "drop-shadow(0 0 10px rgba(186,230,253,0.45))",
-      }}
-      {...(animProps as object)}
-    >
-      <svg viewBox="0 0 100 100" width="100%" height="100%">
+  const moon = (
+    <div style={{ position: "relative", width: "100%", height: "100%", filter: "drop-shadow(0 0 10px rgba(186,230,253,0.45))" }}>
+      <svg viewBox="0 0 100 100" width="100%" height="100%" style={{ display: "block" }}>
         <defs>
           <radialGradient id="cm-body" cx="38%" cy="34%" r="72%">
             <stop offset="0%"  stopColor="#fefce8" />
@@ -77,26 +59,43 @@ export function CrescentMoonIcon({ size = 72, className }: CrescentMoonIconProps
         />
 
 
-        {animated && (
-          <>
-            <motion.circle
-              cx="78" cy="32" r="1.2" fill="#fef3c7"
-              animate={{ opacity: [0, 1, 0], scale: [0.6, 1.4, 0.6] }}
-              transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.circle
-              cx="74" cy="68" r="0.9" fill="#fef3c7"
-              animate={{ opacity: [0, 1, 0], scale: [0.6, 1.3, 0.6] }}
-              transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut", delay: 1.1 }}
-            />
-            <motion.circle
-              cx="86" cy="52" r="0.8" fill="#fef3c7"
-              animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
-              transition={{ duration: 2.9, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
-            />
-          </>
-        )}
       </svg>
-    </Wrap>
+    </div>
+  );
+
+  const box = { width: size, height: size, display: "inline-block", position: "relative" } as const;
+  if (!animated) {
+    return <div className={className} style={box}>{moon}</div>;
+  }
+
+  const sparkle = { transformBox: "fill-box", transformOrigin: "center" } as const;
+  return (
+    <Loop
+      className={className}
+      style={box}
+      animate={{ y: [0, -2, 0, 1.5, 0], rotate: [-3, -1, -4, -2, -3] }}
+      transition={{ duration: 12, ease: "easeInOut" }}
+    >
+      {moon}
+      <svg
+        viewBox="0 0 100 100"
+        width="100%"
+        height="100%"
+        style={{ position: "absolute", inset: 0, willChange: "transform" }}
+      >
+        <circle
+          cx="78" cy="32" r="1.2" fill="#fef3c7"
+          style={{ ...sparkle, ...loopStyle({ opacity: [0, 1, 0], scale: [0.6, 1.4, 0.6] }, { duration: 2.6, ease: "easeInOut" }) }}
+        />
+        <circle
+          cx="74" cy="68" r="0.9" fill="#fef3c7"
+          style={{ ...sparkle, ...loopStyle({ opacity: [0, 1, 0], scale: [0.6, 1.3, 0.6] }, { duration: 3.2, ease: "easeInOut", delay: 1.1 }) }}
+        />
+        <circle
+          cx="86" cy="52" r="0.8" fill="#fef3c7"
+          style={{ ...sparkle, ...loopStyle({ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }, { duration: 2.9, ease: "easeInOut", delay: 0.6 }) }}
+        />
+      </svg>
+    </Loop>
   );
 }

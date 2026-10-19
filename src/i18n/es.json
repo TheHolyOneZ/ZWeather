@@ -179,7 +179,7 @@
     "apiWeatherGov": "Alertas meteorológicas (EE. UU.)",
     "apiMeteoAlarm": "Alertas meteorológicas (UE)",
     "apiRainViewer": "Manifiesto de tiles de radar (precipitación)",
-    "apiCartoDB": "Capa base del mapa (Dark Matter, © OSM)",
+    "apiEsri": "Capa base del mapa (Esri Dark Gray Canvas, © OSM)",
     "sectionDeveloper": "Desarrollador",
     "replaySetup": "Reproducir configuración",
     "replaySetupDesc": "Vuelve a mostrar la animación de intro y el asistente de configuración en el próximo inicio.",
@@ -337,6 +337,7 @@
     "previous": "Cuadro anterior",
     "next": "Cuadro siguiente",
     "loading": "Cargando",
+    "loadFailed": "Servicio meteorológico saturado, reintentando…",
     "layers": {
       "precipitation": "Lluvia",
       "clouds": "Nubes",

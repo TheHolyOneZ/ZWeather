@@ -74,8 +74,6 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("error while building ZWeather")
         .run(|_app, event| {
-
-
             if let tauri::RunEvent::ExitRequested { code: None, api, .. } = event {
                 api.prevent_exit();
             }

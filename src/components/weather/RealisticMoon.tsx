@@ -1,8 +1,7 @@
-import { motion } from "framer-motion";
+import { Loop } from "@/components/ui/Loop";
 import { useMemo } from "react";
 
 interface RealisticMoonProps {
-
   phase: number;
 
   size: number;
@@ -31,9 +30,7 @@ interface Mare {
   darkness: number;
 }
 
-
 const MARIA: Mare[] = [
-
   { cx: 36, cy: 32, rx: 13, ry: 10, rotate: -18, darkness: 0.68 },
 
   { cx: 56, cy: 32, rx: 9, ry: 8, rotate: 5, darkness: 0.62 },
@@ -58,9 +55,7 @@ const MARIA: Mare[] = [
   { cx: 74, cy: 36, rx: 5, ry: 4, rotate: 12, darkness: 0.65 },
 ];
 
-
 const CRATERS: Crater[] = [
-
   { cx: 46, cy: 70, r: 2.2, depth: 0.7, sharpness: 1.0 },
 
   { cx: 40, cy: 46, r: 1.8, depth: 0.65, sharpness: 0.9 },
@@ -120,12 +115,10 @@ export function RealisticMoon({
   const cy = 50;
   const r = 44;
 
-
   const phaseAngle = (phase - 0.5) * 2 * Math.PI;
   const isWaxing = phase < 0.5;
   const isNew = phase <= 0.02 || phase >= 0.98;
   const isFull = phase >= 0.48 && phase <= 0.52;
-
 
   const ellipseRx = Math.abs(r * Math.cos(phaseAngle));
 
@@ -381,14 +374,13 @@ export function RealisticMoon({
   );
 }
 
-
 export function BreathingMoon(props: RealisticMoonProps) {
   return (
-    <motion.div
+    <Loop
       animate={{ y: [0, -4, 0], rotate: [-0.6, 0.6, -0.6] }}
-      transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+      transition={{ duration: 14, ease: "easeInOut" }}
     >
       <RealisticMoon {...props} />
-    </motion.div>
+    </Loop>
   );
 }

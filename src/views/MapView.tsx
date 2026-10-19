@@ -1,5 +1,3 @@
-
-
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
@@ -29,6 +27,9 @@ interface MapViewProps {
 
 const FRAME_INTERVAL_MS = 700;
 
+const ESRI_TILES = "https://services.arcgisonline.com/ArcGIS/rest/services";
+const ESRI_ATTRIBUTION = "Esri, HERE, Garmin, © OpenStreetMap contributors";
+
 function buildLayer(id: LayerId): WeatherLayer {
   switch (id) {
     case "precip":      return createPrecipLayer();
@@ -54,8 +55,8 @@ export function MapView({ locations, activeLocationId, onClose }: MapViewProps) 
   const [layerReady, setLayerReady] = useState(false);
   const [layerLoaded, setLayerLoaded] = useState(0);
   const [layerTotal, setLayerTotal] = useState(0);
+  const [layerError, setLayerError] = useState(false);
   const [currentLegend, setCurrentLegend] = useState(() => createPrecipLayer().getLegend());
-
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
@@ -67,32 +68,29 @@ export function MapView({ locations, activeLocationId, onClose }: MapViewProps) 
       center,
       zoom: 6,
 
-
       minZoom: 4,
       maxZoom: 11,
       zoomControl: false,
-      attributionControl: false,
-
+      attributionControl: true,
 
       worldCopyJump: false,
     });
 
-    L.tileLayer("https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png", {
+    map.attributionControl.setPrefix(false);
+    L.tileLayer(`${ESRI_TILES}/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}`, {
       minZoom: 3,
       maxZoom: 11,
-      subdomains: "abcd",
-      attribution: "© OpenStreetMap, © CartoDB",
+      maxNativeZoom: 16,
+      attribution: ESRI_ATTRIBUTION,
     }).addTo(map);
 
-
-    L.tileLayer("https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_only_labels/{z}/{x}/{y}.png", {
+    L.tileLayer(`${ESRI_TILES}/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`, {
       minZoom: 3,
       maxZoom: 11,
-      subdomains: "abcd",
+      maxNativeZoom: 16,
       pane: "shadowPane",
       opacity: 0.85,
     }).addTo(map);
-
 
     locations.forEach((loc) => {
       const cached = queryClient.getQueryData<CurrentWeather>(["weather", "current", loc.id]);
@@ -144,12 +142,15 @@ export function MapView({ locations, activeLocationId, onClose }: MapViewProps) 
 
     mapRef.current = map;
 
-
     const invalidateTimers = [120, 320].map((ms) =>
       window.setTimeout(() => map.invalidateSize({ animate: false }), ms),
     );
 
+    const resizeObserver = new ResizeObserver(() => map.invalidateSize({ animate: false }));
+    resizeObserver.observe(mapContainerRef.current);
+
     return () => {
+      resizeObserver.disconnect();
       invalidateTimers.forEach((id) => window.clearTimeout(id));
       layerRef.current?.unmount();
       layerRef.current = null;
@@ -158,11 +159,9 @@ export function MapView({ locations, activeLocationId, onClose }: MapViewProps) 
     };
   }, [locations, activeLocationId, queryClient, tempUnit]);
 
-
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-
 
     layerRef.current?.unmount();
     setFrames([]);
@@ -171,6 +170,7 @@ export function MapView({ locations, activeLocationId, onClose }: MapViewProps) 
     setLayerReady(false);
     setLayerLoaded(0);
     setLayerTotal(0);
+    setLayerError(false);
 
     const layer = buildLayer(activeLayerId);
     layerRef.current = layer;
@@ -181,11 +181,11 @@ export function MapView({ locations, activeLocationId, onClose }: MapViewProps) 
       setLayerReady(s.ready);
       setLayerLoaded(s.loaded);
       setLayerTotal(s.total);
+      setLayerError(!!s.error);
     });
     const offFrames = layer.onFramesChange?.((f) => {
       setFrames(f);
       if (f.length > 0) {
-
         const nowSec = Math.floor(Date.now() / 1000);
         let idx = 0;
         for (let i = 0; i < f.length; i++) if (f[i].time <= nowSec) idx = i;
@@ -201,11 +201,9 @@ export function MapView({ locations, activeLocationId, onClose }: MapViewProps) 
     };
   }, [activeLayerId]);
 
-
   useEffect(() => {
     layerRef.current?.setFrame?.(frameIdx);
   }, [frameIdx]);
-
 
   useEffect(() => {
     if (!playing || frames.length === 0 || !layerReady) return;
@@ -214,7 +212,6 @@ export function MapView({ locations, activeLocationId, onClose }: MapViewProps) 
     }, FRAME_INTERVAL_MS);
     return () => window.clearInterval(id);
   }, [playing, frames.length, layerReady]);
-
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -256,7 +253,7 @@ export function MapView({ locations, activeLocationId, onClose }: MapViewProps) 
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="absolute inset-0 bg-black/80 backdrop-blur-md"
+        className="absolute inset-0 bg-black/85"
         onClick={onClose}
       />
 
@@ -291,7 +288,7 @@ export function MapView({ locations, activeLocationId, onClose }: MapViewProps) 
 
 
         <div className="flex-1 relative" style={{ background: "#0a0a10" }}>
-          <div ref={mapContainerRef} className="absolute inset-0" />
+          <div ref={mapContainerRef} className="absolute inset-0 isolate" />
 
           {activeLocation && <PlaceSpotlight location={activeLocation} />}
           <LayerSwitcher active={activeLayerId} onChange={setActiveLayerId} />
@@ -299,11 +296,11 @@ export function MapView({ locations, activeLocationId, onClose }: MapViewProps) 
 
           {!layerReady && (
             <div className="absolute top-16 left-1/2 -translate-x-1/2 z-[400] pointer-events-none">
-              <div className="rounded-full px-3 py-1.5 bg-black/70 border border-white/[0.08] backdrop-blur-md shadow-lg flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full border-2 border-white/25 border-t-violet-400 animate-spin" />
+              <div className="rounded-full px-3 py-1.5 bg-black/80 border border-white/[0.08] shadow-lg flex items-center gap-2">
+                <span className={`w-3 h-3 rounded-full border-2 border-white/25 animate-spin ${layerError ? "border-t-amber-400" : "border-t-violet-400"}`} />
                 <span className="text-[11px] font-medium text-white/80 tabular-nums">
-                  {t("radar.loading")}
-                  {layerTotal > 1 ? ` ${layerLoaded}/${layerTotal}` : ""}
+                  {layerError ? t("radar.loadFailed") : t("radar.loading")}
+                  {!layerError && layerTotal > 1 ? ` ${layerLoaded}/${layerTotal}` : ""}
                 </span>
               </div>
             </div>

@@ -38,7 +38,6 @@ function applyAqi(score: Score, reason: string, key: string, level: AqiLevel, t:
   return { score, reason };
 }
 
-
 function fmtT(c: number, u: TempUnit): string {
   return `${Math.round(convertTemp(c, u))}${tempUnitSymbol(u)}`;
 }

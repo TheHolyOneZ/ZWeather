@@ -1,5 +1,3 @@
-
-
 import L from "leaflet";
 import type { GridSample } from "@/lib/openMeteoGrid";
 import { fetchGridSample, latLonToGrid, sample } from "@/lib/openMeteoGrid";
@@ -13,6 +11,7 @@ import type { LayerReadyState, WeatherLayer } from "./types";
 
 const GRID_SIZE = 10;
 const REFRESH_DEBOUNCE_MS = 1200;
+const RETRY_MS = 15_000;
 const LOW_RES_SCALE = 0.25;
 const OPACITY = 0.45;
 
@@ -27,8 +26,6 @@ const RAMP: [number, [number, number, number]][] = [
 ];
 
 function colorAt(t: number): [number, number, number] {
-
-
   if (!Number.isFinite(t)) return [80, 80, 90];
   if (t <= RAMP[0][0]) return RAMP[0][1];
   if (t >= RAMP[RAMP.length - 1][0]) return RAMP[RAMP.length - 1][1];
@@ -110,8 +107,6 @@ export function createTemperatureLayer(): WeatherLayer {
       ctx.drawImage(low, 0, 0, W, H);
       ctx.globalAlpha = 1;
     } catch {
-
-
     }
   }
 
@@ -138,21 +133,20 @@ export function createTemperatureLayer(): WeatherLayer {
       ready = { ready: true, loaded: 1, total: 1 };
       emitReady();
       scheduleRedraw();
-    } catch {
+    } catch (e) {
       if (isInitial && map) {
-        ready = { ready: false, loaded: 0, total: 1 };
+        ready = { ready: false, loaded: 0, total: 1, error: true };
         emitReady();
       }
+      throw e;
     }
-  }, { debounceMs: REFRESH_DEBOUNCE_MS, urgentMs: 60 });
+  }, { debounceMs: REFRESH_DEBOUNCE_MS, urgentMs: 60, retryMs: RETRY_MS });
 
   const onMove = () => {
     resizeCanvas();
     if (grid) scheduleRedraw();
   };
   const onMoveEnd = () => {
-
-
     if (map && viewEscapedGrid(safeBounds(map), grid)) {
       controller.scheduleUrgent();
     } else {
@@ -160,8 +154,6 @@ export function createTemperatureLayer(): WeatherLayer {
     }
   };
   const onZoomEnd = () => {
-
-
     controller.scheduleUrgent();
   };
   const onResize = () => {

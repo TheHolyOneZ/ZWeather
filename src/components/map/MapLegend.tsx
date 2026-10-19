@@ -31,7 +31,7 @@ export function MapLegend({ legend }: Props) {
 
   return (
     <div className="absolute bottom-3 left-3 z-[400] pointer-events-none">
-      <div className="rounded-xl px-3 py-2 bg-black/65 border border-white/[0.08] backdrop-blur-md shadow-lg">
+      <div className="rounded-xl px-3 py-2 bg-black/75 border border-white/[0.08] shadow-lg">
         <div className="flex items-center justify-between mb-1.5 gap-3">
           <p className="text-[10px] uppercase tracking-wider text-white/55 font-semibold">
             {t(legend.titleKey)}

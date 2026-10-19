@@ -48,7 +48,7 @@ export function MapTimeline({
 
   return (
     <div className="shrink-0 px-4 pt-3 pb-4 z-10">
-      <div className="rounded-xl bg-black/65 border border-white/[0.08] backdrop-blur-md shadow-lg px-3 py-2.5 flex items-center gap-2">
+      <div className="rounded-xl bg-black/75 border border-white/[0.08] shadow-lg px-3 py-2.5 flex items-center gap-2">
         <button
           onClick={() => step(-1)}
           className="w-8 h-8 rounded-md flex items-center justify-center text-white/55 hover:text-white hover:bg-white/[0.08] transition-colors"

@@ -39,7 +39,6 @@ export function LocationContextMenu({
     };
   }, [onClose]);
 
-
   const menuW = 200;
   const menuH = isPrimary ? 48 : 88;
   const safeX = Math.min(x, window.innerWidth - menuW - 8);

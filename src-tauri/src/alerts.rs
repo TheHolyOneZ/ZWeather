@@ -27,7 +27,7 @@ fn meteoalarm_severity(level: &str) -> &'static str {
 impl AlertFetcher {
     pub fn new() -> Self {
         let client = reqwest::Client::builder()
-            .user_agent("ZWeather/0.1.0 (https://github.com/TheHolyOneZ/ZWeather)")
+            .user_agent("ZWeather/0.1.3 (https://github.com/TheHolyOneZ/ZWeather)")
             .build()
             .expect("failed to build HTTP client");
         Self { client }
@@ -110,13 +110,11 @@ impl AlertFetcher {
     }
 }
 
-
 fn local_name(qname: &str) -> &str {
     qname.rsplit(':').next().unwrap_or(qname)
 }
 
 fn stable_id(title: &str, summary: &str, location_id: &str) -> String {
-
     let mut hash: u64 = 0xcbf29ce484222325;
     for b in title.as_bytes().iter().chain(b"\x1f".iter()).chain(summary.as_bytes().iter()) {
         hash ^= *b as u64;

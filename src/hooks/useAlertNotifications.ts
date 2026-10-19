@@ -22,7 +22,6 @@ function saveSeen(seen: Set<string>) {
     const arr = Array.from(seen).slice(-MAX_SEEN_RETAINED);
     localStorage.setItem(SEEN_KEY, JSON.stringify(arr));
   } catch {
-
   }
 }
 
@@ -47,8 +46,6 @@ export function useAlertNotifications(alerts: WeatherAlert[] | undefined) {
       (a) => !seen.has(a.id) && severityEnabled[a.severity],
     );
     if (fresh.length === 0) {
-
-
       let dirty = false;
       for (const a of alerts) {
         if (!seen.has(a.id)) {
@@ -67,11 +64,8 @@ export function useAlertNotifications(alerts: WeatherAlert[] | undefined) {
       try {
         const perm = await ensurePermission();
         if (perm !== "granted") {
-
-
           return;
         }
-
 
         const ordered = [...fresh].sort(
           (a, b) =>
@@ -88,7 +82,6 @@ export function useAlertNotifications(alerts: WeatherAlert[] | undefined) {
             body: `${firstTitle} and ${count - 1} more — open ZWeather for details.`,
           }),
         );
-
 
         for (const a of ordered) seen.add(a.id);
         for (const a of alerts) seen.add(a.id);

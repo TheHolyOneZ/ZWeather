@@ -18,7 +18,6 @@ const POPOVER_W: f64 = 360.0;
 const POPOVER_H: f64 = 440.0;
 const POPOVER_MARGIN: f64 = 8.0;
 
-
 const BLUR_REOPEN_GUARD: Duration = Duration::from_millis(300);
 
 #[derive(Default)]
@@ -120,7 +119,6 @@ mod foreground {
     }
 }
 
-
 #[cfg(windows)]
 fn watch_click_away(app: &AppHandle, win: &WebviewWindow) {
     let Some(state) = app.try_state::<PopoverState>() else { return };
@@ -160,14 +158,12 @@ pub fn hide_popover(win: &WebviewWindow) {
     let _ = win.emit_to("tray", "zw://tray-visibility", false);
 }
 
-
 fn position_popover(app: &AppHandle, win: &WebviewWindow, tray_rect: Rect, cursor: PhysicalPosition<f64>) {
     let Some(monitor) = win.primary_monitor().ok().flatten() else { return };
     let scale_hint = monitor.scale_factor();
 
     let mut tray_pos = tray_rect.position.to_physical::<f64>(scale_hint);
     let mut tray_size = tray_rect.size.to_physical::<f64>(scale_hint);
-
 
     if tray_size.width < 1.0 || tray_size.height < 1.0 {
         tray_pos = cursor;
@@ -199,7 +195,6 @@ fn position_popover(app: &AppHandle, win: &WebviewWindow, tray_rect: Rect, curso
         .min(work_right - w - margin)
         .max(work_left + margin);
 
-
     let mon_mid_y = mon_pos.y as f64 + mon_size.height as f64 / 2.0;
     let y = if anchor_y >= mon_mid_y {
         tray_pos.y.min(work_bottom) - h - margin
@@ -208,12 +203,10 @@ fn position_popover(app: &AppHandle, win: &WebviewWindow, tray_rect: Rect, curso
     };
     let y = y.min(work_bottom - h - margin).max(work_top + margin);
 
-
     let _ = win.set_size(LogicalSize::new(POPOVER_W, POPOVER_H));
     let _ = win.set_position(PhysicalPosition::new(x.round() as i32, y.round() as i32));
     let _ = win.set_size(LogicalSize::new(POPOVER_W, POPOVER_H));
 }
-
 
 pub fn show_main(app: &AppHandle) {
     if let Some(pop) = app.get_webview_window("tray") {
@@ -252,7 +245,6 @@ fn create_main(app: &AppHandle) {
     else {
         return;
     };
-
 
     let built = WebviewWindowBuilder::from_config(app, &config)
         .map(|b| b.initialization_script("window.__ZW_REOPENED__ = true;"))

@@ -32,7 +32,6 @@ function drawTemp(ctx: CanvasRenderingContext2D, text: string, maxSize: number, 
   const x = alignRight ? SIZE - 0.5 : SIZE / 2;
   const y = alignRight ? SIZE - 1 : SIZE / 2 + size * 0.36;
 
-
   ctx.lineJoin = "round";
   ctx.lineWidth = Math.max(2, size / 6);
   ctx.strokeStyle = "rgba(0, 0, 0, 0.75)";
@@ -55,7 +54,6 @@ async function renderIcon(
     const now = Date.now() / 1000;
     const isDay = now > current.sunrise && now < current.sunset;
     const img = await loadImage(meteoconUrlFill(wmoToMeteocon(current.condition_code, isDay)));
-
 
     if (style === "icon") ctx.drawImage(img, -7, -7, SIZE + 14, SIZE + 14);
     else ctx.drawImage(img, -8, -9, SIZE + 8, SIZE + 8);

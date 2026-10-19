@@ -1,5 +1,3 @@
-
-
 import { useEffect, useReducer, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { recordComplete, recordSkip } from "@/lib/introPreference";
@@ -32,7 +30,6 @@ export function CinematicIntro({ onFinish }: CinematicIntroProps) {
     const total = reduced ? 600 : 5000;
     const timer = window.setTimeout(() => finish(false), total);
     return () => window.clearTimeout(timer);
-
   }, [reduced]);
 
   useEffect(() => {
@@ -41,7 +38,6 @@ export function CinematicIntro({ onFinish }: CinematicIntroProps) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-
   }, []);
 
   const onPointerDown = () => {
@@ -105,12 +101,8 @@ export function CinematicIntro({ onFinish }: CinematicIntroProps) {
   );
 }
 
-
 function SkyGradient() {
-
-
   const skies = [
-
     "radial-gradient(ellipse 120% 80% at 50% 110%, #1a1d3a 0%, #0a0d20 50%, #04060b 100%)",
 
     "radial-gradient(ellipse 120% 80% at 50% 110%, #3a2550 0%, #14132e 55%, #04060b 100%)",
@@ -137,7 +129,6 @@ function SkyGradient() {
     />
   );
 }
-
 
 function StarField() {
   return (
@@ -185,7 +176,6 @@ const STARS = Array.from({ length: 60 }, (_, i) => {
   };
 });
 
-
 function DistantMoon() {
   return (
     <motion.div
@@ -224,7 +214,6 @@ function DistantMoon() {
     </motion.div>
   );
 }
-
 
 function SunWithRays() {
   return (
@@ -307,7 +296,6 @@ function SunWithRays() {
   );
 }
 
-
 function LensFlare() {
   return (
     <motion.div
@@ -379,7 +367,6 @@ function LensFlare() {
     </motion.div>
   );
 }
-
 
 function MountainRange() {
   return (
@@ -464,7 +451,6 @@ function Ridge({
   );
 }
 
-
 function DustMotes() {
   return (
     <motion.div
@@ -510,7 +496,6 @@ const MOTES = Array.from({ length: 18 }, (_, i) => {
   };
 });
 
-
 function Wordmark() {
   const letters = "ZWeather".split("");
   return (
@@ -555,7 +540,6 @@ function Wordmark() {
   );
 }
 
-
 function Letterbox() {
   return (
     <>
@@ -574,7 +558,6 @@ function Letterbox() {
     </>
   );
 }
-
 
 function FilmGrain() {
   return (
@@ -596,7 +579,6 @@ function FilmGrain() {
     </svg>
   );
 }
-
 
 function StaticBrandComposition() {
   return (
@@ -626,7 +608,6 @@ function StaticBrandComposition() {
     </div>
   );
 }
-
 
 function SkipHint({ visible }: { visible: boolean }) {
   return (

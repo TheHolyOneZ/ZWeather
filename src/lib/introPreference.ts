@@ -1,5 +1,3 @@
-
-
 const ENABLED_KEY = "zweather.intro.enabled";
 const SKIP_STREAK_KEY = "zweather.intro.skipStreak";
 const AUTO_DISABLE_THRESHOLD = 3;

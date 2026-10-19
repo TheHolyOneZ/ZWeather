@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ChevronRight } from "lucide-react";
 import type { WeatherAlert, AlertSeverity } from "@/types/alerts";
 import { SEVERITY_ORDER } from "@/types/alerts";
+import { loopStyle } from "@/lib/ambient";
 
 interface AlertBannerProps {
   alerts: WeatherAlert[];
@@ -63,12 +64,13 @@ export function AlertBanner({ alerts, onClick }: AlertBannerProps) {
     >
 
       {shouldPulse && (
-        <motion.span
+        <span
           aria-hidden
-          className="absolute inset-0 rounded-xl pointer-events-none"
-          style={{ background: style.bg }}
-          animate={{ opacity: [0.55, 0.95, 0.55] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          className="zw-ambient absolute inset-0 rounded-xl pointer-events-none"
+          style={{
+            background: style.bg,
+            ...loopStyle({ opacity: [0.55, 0.95, 0.55] }, { duration: 2.4, ease: "easeInOut" }),
+          }}
         />
       )}
 

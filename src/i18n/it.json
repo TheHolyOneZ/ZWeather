@@ -179,7 +179,7 @@
     "apiWeatherGov": "Avvisi meteo (USA)",
     "apiMeteoAlarm": "Avvisi meteo (UE)",
     "apiRainViewer": "Manifest dei tile radar (precipitazioni)",
-    "apiCartoDB": "Livello base mappa (Dark Matter, © OSM)",
+    "apiEsri": "Livello base mappa (Esri Dark Gray Canvas, © OSM)",
     "sectionDeveloper": "Sviluppatore",
     "replaySetup": "Riproduci configurazione",
     "replaySetupDesc": "Mostra di nuovo l'animazione di intro e la procedura guidata al prossimo avvio.",
@@ -337,6 +337,7 @@
     "previous": "Fotogramma precedente",
     "next": "Fotogramma successivo",
     "loading": "Caricamento",
+    "loadFailed": "Servizio meteo sovraccarico, nuovo tentativo…",
     "layers": {
       "precipitation": "Pioggia",
       "clouds": "Nuvole",

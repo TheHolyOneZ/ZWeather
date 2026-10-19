@@ -36,7 +36,7 @@ export function LocationCard({ location, isActive, onClick, onSetPrimary, onRemo
     <>
       <motion.button
         className={cn(
-          "shrink-0 flex items-center gap-2 h-10 px-3 rounded-xl transition-colors border",
+          "zw-icon-host shrink-0 flex items-center gap-2 h-10 px-3 rounded-xl transition-colors border",
           isActive
             ? "bg-white/[0.12] border-white/20 text-white shadow-[0_0_0_3px_rgba(255,255,255,0.04)]"
             : "bg-transparent border-white/[0.08] hover:border-white/15 hover:bg-white/[0.04] text-white/55 hover:text-white/90"
@@ -49,7 +49,7 @@ export function LocationCard({ location, isActive, onClick, onSetPrimary, onRemo
         title={location.display_name}
       >
         {weather ? (
-          <WeatherIcon code={weather.condition_code} isDay={isDay} size={14} />
+          <WeatherIcon code={weather.condition_code} isDay={isDay} size={14} idle />
         ) : (
           <div className="w-3.5 h-3.5 rounded skeleton shrink-0" />
         )}

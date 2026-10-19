@@ -250,7 +250,7 @@ pub async fn search_locations(query: String, language: Option<String>) -> Result
         urlencoding::encode(&lang),
     );
     let client = reqwest::Client::builder()
-        .user_agent("ZWeather/0.1.0")
+        .user_agent("ZWeather/0.1.3")
         .build()?;
     let resp: serde_json::Value = client.get(&url).send().await?.json().await?;
     let results = match resp["results"].as_array() {
@@ -286,7 +286,6 @@ pub fn set_tray_tooltip(app: AppHandle, tooltip: String) -> Result<()> {
     }
     Ok(())
 }
-
 
 #[tauri::command]
 pub fn set_tray_icon(
@@ -401,11 +400,10 @@ pub async fn refresh_location_names(
     };
 
     let client = reqwest::Client::builder()
-        .user_agent("ZWeather/0.1.0")
+        .user_agent("ZWeather/0.1.3")
         .build()?;
 
     for (id, stored_name, lat, lon, geo_id) in locations {
-
         if let Some(gid) = geo_id {
             if let Some(r) = fetch_by_geo_id(&client, gid, &language).await {
                 let new_display = build_display(&r, &stored_name);
@@ -420,12 +418,10 @@ pub async fn refresh_location_names(
             continue;
         }
 
-
         let city = stored_name.split(',').next().unwrap_or(&stored_name).trim().to_string();
         if city.is_empty() {
             continue;
         }
-
 
         let mut terms: Vec<String> = vec![city.clone()];
         for word in city.split(|c: char| c.is_whitespace() || c == '-' || c == '/' || c == '_') {
@@ -455,7 +451,6 @@ pub async fn refresh_location_names(
 
         let Some(r) = matched else { continue };
         let discovered_id = r["id"].as_i64();
-
 
         let final_r = if let Some(gid) = discovered_id {
             fetch_by_geo_id(&client, gid, &language).await.unwrap_or(r)

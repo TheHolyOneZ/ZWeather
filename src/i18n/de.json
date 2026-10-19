@@ -179,7 +179,7 @@
     "apiWeatherGov": "Unwetterwarnungen (USA)",
     "apiMeteoAlarm": "Unwetterwarnungen (EU)",
     "apiRainViewer": "Radar-Kachelmanifest (Niederschlag)",
-    "apiCartoDB": "Kartengrundlage (Dark Matter, © OSM)",
+    "apiEsri": "Kartengrundlage (Esri Dark Gray Canvas, © OSM)",
     "sectionDeveloper": "Entwickler",
     "replaySetup": "Setup wiederholen",
     "replaySetupDesc": "Zeigt die Intro-Animation und den Einrichtungsassistenten beim nächsten Start erneut.",
@@ -337,6 +337,7 @@
     "previous": "Vorheriges Bild",
     "next": "Nächstes Bild",
     "loading": "Wird geladen",
+    "loadFailed": "Wetterdienst ausgelastet, neuer Versuch …",
     "layers": {
       "precipitation": "Regen",
       "clouds": "Wolken",

@@ -179,7 +179,7 @@
     "apiWeatherGov": "Severe-weather alerts (US)",
     "apiMeteoAlarm": "Severe-weather alerts (EU)",
     "apiRainViewer": "Radar tile manifest (precipitation)",
-    "apiCartoDB": "Map base layer (Dark Matter, © OSM)",
+    "apiEsri": "Map base layer (Esri Dark Gray Canvas, © OSM)",
     "sectionDeveloper": "Developer",
     "replaySetup": "Replay setup",
     "replaySetupDesc": "Re-shows the intro animation and onboarding wizard on next launch.",
@@ -337,6 +337,7 @@
     "previous": "Previous frame",
     "next": "Next frame",
     "loading": "Loading",
+    "loadFailed": "Weather service busy, retrying…",
     "layers": {
       "precipitation": "Rain",
       "clouds": "Clouds",

@@ -6,7 +6,6 @@ import { api } from "@/lib/api";
 import { broadcastDataChanged } from "@/lib/crossWindow";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
-
 const isDashboard = getCurrentWindow().label === "main";
 
 export function useLanguageSync() {

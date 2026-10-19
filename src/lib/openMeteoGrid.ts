@@ -1,5 +1,3 @@
-
-
 export interface BBox {
   south: number;
   west: number;
@@ -25,20 +23,17 @@ export interface GridSample {
 const CACHE_TTL_MS = 15 * 60 * 1000;
 const cache = new Map<string, { at: number; data: GridSample }>();
 
-
 const inflight = new Map<string, Promise<GridSample>>();
 
 function bboxKey(b: BBox, size: number): string {
-
-
   const r = (v: number) => Math.round(v);
   return `${size}|${r(b.south)},${r(b.west)},${r(b.north)},${r(b.east)}`;
 }
 
-
 let lastRequestAt = 0;
 const MIN_REQUEST_INTERVAL_MS = 250;
 const MAX_RETRIES = 4;
+const REQUEST_TIMEOUT_MS = 20_000;
 
 function delay(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
@@ -49,8 +44,15 @@ async function rateLimitedFetch(url: string): Promise<Response> {
     const wait = Math.max(0, lastRequestAt + MIN_REQUEST_INTERVAL_MS - Date.now());
     if (wait > 0) await delay(wait);
     lastRequestAt = Date.now();
-    const res = await fetch(url);
-    if (res.status !== 429) return res;
+    const abort = new AbortController();
+    const timer = setTimeout(() => abort.abort(), REQUEST_TIMEOUT_MS);
+    let res: Response;
+    try {
+      res = await fetch(url, { signal: abort.signal });
+    } finally {
+      clearTimeout(timer);
+    }
+    if (res.status !== 429 && res.status !== 503) return res;
     if (attempt >= MAX_RETRIES) return res;
     const retryAfterHeader = res.headers.get("Retry-After");
     const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader, 10) : NaN;
@@ -64,7 +66,6 @@ async function rateLimitedFetch(url: string): Promise<Response> {
 function clamp(v: number, lo: number, hi: number): number {
   return v < lo ? lo : v > hi ? hi : v;
 }
-
 
 export function sample(field: Float32Array, size: number, fx: number, fy: number): number {
   const x = clamp(fx, 0, size - 1.0001);
@@ -81,7 +82,6 @@ export function sample(field: Float32Array, size: number, fx: number, fy: number
   const bot = field[i01] * (1 - dx) + field[i11] * dx;
   return top * (1 - dy) + bot * dy;
 }
-
 
 export function latLonToGrid(
   lat: number,
@@ -138,7 +138,6 @@ export async function fetchGridSample(bbox: BBox, size = 14): Promise<GridSample
 }
 
 async function fetchGridSampleUncached(bbox: BBox, size: number, key: string): Promise<GridSample> {
-
   const lats: number[] = [];
   const lons: number[] = [];
   for (let row = 0; row < size; row++) {
@@ -151,7 +150,6 @@ async function fetchGridSampleUncached(bbox: BBox, size: number, key: string): P
       lons.push(+lon.toFixed(3));
     }
   }
-
 
   const CHUNK = 100;
   const all: Awaited<ReturnType<typeof fetchBatch>> = [];

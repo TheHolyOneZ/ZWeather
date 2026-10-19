@@ -55,7 +55,6 @@ export function DayDetailModal({
   const dayStart = new Date(day.date + "T00:00:00").getTime() / 1000 - utcOffsetSeconds;
   const dayEnd = dayStart + 86400;
   const dayAlerts = (alerts ?? []).filter((a) => {
-
     if (!a.issued && !a.expires) return true;
     const issued = a.issued || 0;
     const expires = a.expires || Number.MAX_SAFE_INTEGER;
@@ -290,7 +289,7 @@ export function DayDetailModal({
                   {hours.map((h, i) => (
                     <div
                       key={h.time}
-                      className={`flex flex-col items-center gap-1.5 px-3 py-3 min-w-[78px] ${
+                      className={`zw-icon-host flex flex-col items-center gap-1.5 px-3 py-3 min-w-[78px] ${
                         i < hours.length - 1 ? "border-r border-white/[0.05]" : ""
                       }`}
                       style={{ scrollSnapAlign: "start" }}
@@ -308,6 +307,7 @@ export function DayDetailModal({
                         code={h.condition_code}
                         isDay={isDayHour(h.time, utcOffsetSeconds)}
                         size={20}
+                        idle
                       />
                       <span
                         className="text-[14px] font-semibold tabular-nums leading-none"
@@ -504,7 +504,6 @@ function CloudGlyph() {
 }
 
 function HumidityGlyph() {
-
   return (
     <svg width="10" height="8" viewBox="0 0 12 9" fill="none" className="shrink-0">
       <path
@@ -531,7 +530,6 @@ function HumidityGlyph() {
     </svg>
   );
 }
-
 
 function MetricRow({
   label,
@@ -586,8 +584,6 @@ function ValueWithGlyph({
 }
 
 function Divider() {
-
-
   return (
     <svg
       width="1"
@@ -622,8 +618,6 @@ function AccentDot({ color }: { color: string }) {
 }
 
 function SunArc({ sunrise, sunset }: { sunrise: number; sunset: number }) {
-
-
   const now = Date.now() / 1000;
   const pct = sunset > sunrise
     ? Math.max(0, Math.min(1, (now - sunrise) / (sunset - sunrise)))
@@ -651,7 +645,6 @@ function SunArc({ sunrise, sunset }: { sunrise: number; sunset: number }) {
     </div>
   );
 }
-
 
 function DropGlyph() {
   return (

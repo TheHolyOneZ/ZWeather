@@ -46,7 +46,6 @@ function useTrayVisible(): boolean {
   return visible;
 }
 
-
 export function TrayPopover() {
   const { activeLocationId, locations } = useLocationsStore();
   const { isSuccess: locationsLoaded } = useLocations();

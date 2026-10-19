@@ -10,8 +10,6 @@ export function useNotificationPermission(): PermissionState {
   const [state, setState] = useState<PermissionState>(getPermission);
 
   useEffect(() => {
-
-
     void refreshPermission();
     return onPermissionChange(setState);
   }, []);

@@ -11,8 +11,6 @@ interface HeroWeatherIconProps {
 }
 
 export function HeroWeatherIcon({ code, isDay = true, size = 72, className }: HeroWeatherIconProps) {
-
-
   if (code === 0 && !isDay) {
     return <CrescentMoonIcon size={size} className={className} />;
   }

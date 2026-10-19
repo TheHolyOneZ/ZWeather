@@ -18,7 +18,7 @@ export function LayerSwitcher({ active, onChange }: Props) {
   const { t } = useTranslation();
   return (
     <div className="absolute top-3 right-3 z-[420] pointer-events-auto">
-      <div className="rounded-2xl bg-black/65 border border-white/[0.08] backdrop-blur-md shadow-lg p-1 flex gap-0.5">
+      <div className="rounded-2xl bg-black/75 border border-white/[0.08] shadow-lg p-1 flex gap-0.5">
         {LAYERS.map((l) => {
           const Icon = l.icon;
           const isActive = l.id === active;

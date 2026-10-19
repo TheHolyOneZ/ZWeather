@@ -28,7 +28,8 @@ export function HourlyStrip({ hours, currentTemp, utcOffsetSeconds = 0, timeForm
 
   useHorizontalWheel(scrollRef);
 
-  const slice = hours.slice(0, 25);
+  const start = Math.max(0, hours.findIndex((h) => h.time + 3600 > now));
+  const slice = hours.slice(start, start + 25);
   const nowIdx = slice.findIndex(
     (h, i) => h.time <= now && (slice[i + 1]?.time ?? Infinity) > now
   );
@@ -49,7 +50,7 @@ export function HourlyStrip({ hours, currentTemp, utcOffsetSeconds = 0, timeForm
 
           <div className="flex">
             {slice.map((h, i) => {
-              const isPast = h.time < now;
+              const isPast = nowIdx >= 0 && i < nowIdx;
               const isCurrent = i === nowIdx;
               const displayTemp = isCurrent && currentTemp != null ? currentTemp : h.temperature;
               const color = tempToColor(displayTemp);
@@ -61,7 +62,7 @@ export function HourlyStrip({ hours, currentTemp, utcOffsetSeconds = 0, timeForm
                   key={h.time}
                   style={{ width: COL_W, minWidth: COL_W }}
                   className={[
-                    "flex flex-col items-center gap-1 py-2 rounded-xl relative cursor-default",
+                    "zw-icon-host flex flex-col items-center gap-1 py-2 rounded-xl relative cursor-default",
                     isCurrent ? "bg-white/[0.09] ring-1 ring-white/15" : "",
                     isHovered && !isCurrent ? "bg-white/[0.06]" : "",
                     isPast ? "opacity-40" : "",
@@ -77,7 +78,7 @@ export function HourlyStrip({ hours, currentTemp, utcOffsetSeconds = 0, timeForm
                   </span>
 
 
-                  <WeatherIcon code={h.condition_code} isDay={isDayHour(h.time, utcOffsetSeconds)} size={36} />
+                  <WeatherIcon code={h.condition_code} isDay={isDayHour(h.time, utcOffsetSeconds)} size={36} idle={!isCurrent} />
 
 
                   <span className="text-[14px] font-semibold tabular-nums" style={{ color }}>

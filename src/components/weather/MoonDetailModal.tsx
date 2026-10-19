@@ -39,7 +39,6 @@ export function MoonDetailModal({
 }: MoonDetailModalProps) {
   const { t } = useTranslation();
 
-
   const { phase, illumination, ageDays, labelKey } = useMemo(() => getMoonPhase(new Date()), []);
   const geom = useMemo(() => getMoonGeometry(new Date()), []);
   const riseSet = useMemo(
@@ -48,7 +47,6 @@ export function MoonDetailModal({
   );
   const phases = useMemo(() => upcomingPhases(new Date(), 4), []);
   const zodiac = useMemo(() => moonZodiac(new Date()), []);
-
 
   const libration = Math.sin(ageDays / 27.3 * Math.PI * 2) * 4;
   const apparentScale = 0.94 + 0.12 * (1 - geom.perigeeApogeeT);

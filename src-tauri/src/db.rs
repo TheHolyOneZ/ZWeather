@@ -45,7 +45,6 @@ impl Database {
             );
         ")?;
 
-
         let _ = conn.execute("ALTER TABLE locations ADD COLUMN geo_id INTEGER", []);
         Ok(())
     }

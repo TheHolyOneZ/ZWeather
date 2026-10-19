@@ -8,6 +8,7 @@
 <sub>No account. No telemetry. No cloud sync.</sub></p>
 
 <p>
+  <img src="https://img.shields.io/badge/version-0.1.3-8b5cf6?style=flat-square" alt="Version 0.1.3" />
   <img src="https://img.shields.io/badge/Tauri-2-24C8DB?logo=tauri&logoColor=white&style=flat-square" alt="Tauri 2" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white&style=flat-square" alt="React 19" />
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white&style=flat-square" alt="TypeScript" />
@@ -347,7 +348,7 @@ ZWeather is transparent about every API it touches. **No third-party analytics, 
 <tr><td><a href="https://www.weather.gov/">weather.gov</a></td><td>US severe-weather alerts</td><td>No</td></tr>
 <tr><td><a href="https://meteoalarm.org/">MeteoAlarm</a></td><td>European severe-weather alerts</td><td>No</td></tr>
 <tr><td><a href="https://www.geonames.org/">GeoNames</a> / Open-Meteo geocoding</td><td>City search</td><td>No</td></tr>
-<tr><td><a href="https://carto.com/">CartoDB</a></td><td>Map base tiles (dark mode)</td><td>No</td></tr>
+<tr><td><a href="https://www.esri.com/">Esri</a> (World Dark Gray Canvas)</td><td>Map base tiles and labels (dark mode)</td><td>No</td></tr>
 </table>
 
 ---

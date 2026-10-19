@@ -80,14 +80,14 @@ export function Dashboard() {
   const { data: alerts } = useAlerts(activeLocationId);
   const { data: airQuality } = useAirQuality(activeLocationId);
 
-
   const now = Date.now() / 1000;
   const isDay = current ? (now > current.sunrise && now < current.sunset) : true;
   const isEmpty = !locationsLoading && (!locations || locations.length === 0);
   const activeLocation = locations?.find((l) => l.id === activeLocationId);
 
-
   const todayForecast = daily?.[0];
+
+  const overlayOpen = showAdd || showSettings || showAlerts || showRadar || showMoon || showSetup;
 
   async function handleAdd(result: GeocodingResult) {
     await addMutation.mutateAsync({ lat: result.latitude, lon: result.longitude, name: result.display_name, geoId: result.geo_id });
@@ -98,7 +98,10 @@ export function Dashboard() {
     <div className="relative flex flex-col h-screen overflow-hidden bg-[#08080b]">
       <ConditionBackground conditionCode={current?.condition_code ?? -1} isDay={isDay} />
 
-      <div className="relative z-10 flex flex-col h-full">
+      <div
+        className="relative z-10 flex flex-col h-full"
+        data-ambient-paused={overlayOpen ? "" : undefined}
+      >
         <TitleBar
           locationName={activeLocation?.name}
           tzAbbr={current?.timezone_abbreviation}

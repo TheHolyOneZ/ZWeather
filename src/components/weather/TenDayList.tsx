@@ -50,7 +50,6 @@ export function TenDayList({
   const weekMax = Math.max(...days.map((d) => d.temp_high));
   const weekSpan = weekMax - weekMin || 1;
 
-
   const tickValues = [-20, -10, 0, 10, 20, 30, 40].filter(
     (v) => v > weekMin && v < weekMax,
   );
@@ -96,7 +95,7 @@ export function TenDayList({
               <motion.button
                 key={day.date}
                 className={[
-                  "w-full flex items-center gap-3 py-2.5 rounded-xl px-1 text-left",
+                  "zw-icon-host w-full flex items-center gap-3 py-2.5 rounded-xl px-1 text-left",
                   isToday ? "bg-white/[0.04]" : "",
                   "hover:bg-white/[0.04] transition-colors group",
                 ].join(" ")}
@@ -110,7 +109,7 @@ export function TenDayList({
 
 
                 <div className="flex items-center gap-1.5 w-[78px] shrink-0">
-                  <WeatherIcon code={day.condition_code} size={28} />
+                  <WeatherIcon code={day.condition_code} size={28} idle />
                   <span className="text-[12px] text-white/40 truncate">{condLabel}</span>
                 </div>
 
