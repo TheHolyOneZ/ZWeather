@@ -8,7 +8,7 @@
 <sub>No account. No telemetry. No cloud sync.</sub></p>
 
 <p>
-  <img src="https://img.shields.io/badge/version-0.1.3-8b5cf6?style=flat-square" alt="Version 0.1.3" />
+  <img src="https://img.shields.io/badge/version-0.1.4-8b5cf6?style=flat-square" alt="Version 0.1.4" />
   <img src="https://img.shields.io/badge/Tauri-2-24C8DB?logo=tauri&logoColor=white&style=flat-square" alt="Tauri 2" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white&style=flat-square" alt="React 19" />
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white&style=flat-square" alt="TypeScript" />

@@ -278,6 +278,8 @@
     "typeToSearch": "Scrivi il nome di una città"
   },
   "tray": {
+    "nextHours": "Prossime 6 ore",
+    "rainChance": "Probabilità di pioggia",
     "feelsLike": "Percepita {{value}}",
     "openDashboard": "Apri dashboard completa",
     "noLocation": "Nessuna località — apri la dashboard per aggiungerne una.",

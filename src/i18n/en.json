@@ -278,6 +278,8 @@
     "typeToSearch": "Type a city name to search"
   },
   "tray": {
+    "nextHours": "Next 6 hours",
+    "rainChance": "Rain chance",
     "feelsLike": "Feels like {{value}}",
     "openDashboard": "Open full dashboard",
     "noLocation": "No location yet — open the dashboard to add one.",

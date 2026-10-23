@@ -33,6 +33,7 @@ export function useDailyForecast(locationId: string | null) {
     queryKey: ["weather", "daily", locationId],
     queryFn: () => api.getDailyForecast(locationId!),
     enabled: !!locationId,
+    staleTime: 30 * 60 * 1000,
     refetchInterval,
   });
 }

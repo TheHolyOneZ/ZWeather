@@ -15,7 +15,7 @@ use crate::error::Result;
 pub const TRAY_ID: &str = "main-tray";
 
 const POPOVER_W: f64 = 360.0;
-const POPOVER_H: f64 = 440.0;
+const POPOVER_H: f64 = 380.0;
 const POPOVER_MARGIN: f64 = 8.0;
 
 const BLUR_REOPEN_GUARD: Duration = Duration::from_millis(300);

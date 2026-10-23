@@ -278,6 +278,8 @@
     "typeToSearch": "Escribe el nombre de una ciudad"
   },
   "tray": {
+    "nextHours": "Próximas 6 horas",
+    "rainChance": "Probabilidad de lluvia",
     "feelsLike": "Sensación {{value}}",
     "openDashboard": "Abrir panel completo",
     "noLocation": "Aún no hay ubicación — abre el panel para añadir una.",

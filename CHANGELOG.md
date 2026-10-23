@@ -5,6 +5,24 @@ All notable changes to ZWeather are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] — 2026-10-23
+
+A tray popover and Windows GNU build release. No data-format changes, so
+upgrading in place keeps every location and preference.
+
+### Changed
+
+- **The tray popover now works as a compact weather widget.** It shows current
+  conditions, today's high and low, humidity, wind, and the next six hours with
+  local-time labels and rain chances. The layout uses the selected units, has a
+  softer edge, and takes less vertical space.
+
+### Fixed
+
+- **Windows GNU builds could fail with `export ordinal too large`.** The GNU
+  linker now excludes automatic DLL symbol exports for this target, avoiding
+  the export-table limit.
+
 ## [0.1.3] — 2026-10-19
 
 A performance and weather-map release. No data-format changes, so upgrading in
@@ -172,6 +190,7 @@ Initial public release.
 - Five languages: English, German, French, Spanish, Italian.
 - Fully local storage — no account, no telemetry, no cloud sync.
 
+[0.1.4]: https://github.com/TheHolyOneZ/ZWeather/releases/tag/v0.1.4
 [0.1.3]: https://github.com/TheHolyOneZ/ZWeather/releases/tag/v0.1.3
 [0.1.2]: https://github.com/TheHolyOneZ/ZWeather/releases/tag/v0.1.2
 [0.1.1]: https://github.com/TheHolyOneZ/ZWeather/releases/tag/v0.1.1

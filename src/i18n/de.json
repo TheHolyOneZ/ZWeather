@@ -278,6 +278,8 @@
     "typeToSearch": "Stadtnamen eingeben, um zu suchen"
   },
   "tray": {
+    "nextHours": "Nächste 6 Stunden",
+    "rainChance": "Regenwahrscheinlichkeit",
     "feelsLike": "Gefühlt {{value}}",
     "openDashboard": "Volles Dashboard öffnen",
     "noLocation": "Noch kein Ort — öffne das Dashboard, um einen hinzuzufügen.",

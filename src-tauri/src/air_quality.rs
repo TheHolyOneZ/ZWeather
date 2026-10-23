@@ -8,7 +8,7 @@ pub struct AirQualityFetcher {
 impl AirQualityFetcher {
     pub fn new() -> Self {
         let client = reqwest::Client::builder()
-            .user_agent("ZWeather/0.1.3 (https://github.com/TheHolyOneZ/ZWeather)")
+            .user_agent("ZWeather/0.1.4 (https://github.com/TheHolyOneZ/ZWeather)")
             .build()
             .expect("failed to build HTTP client");
         Self { client }

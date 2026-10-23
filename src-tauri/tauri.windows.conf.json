@@ -20,14 +20,14 @@
         "label": "tray",
         "title": "ZWeather",
         "width": 360,
-        "height": 440,
+        "height": 380,
         "visible": false,
         "decorations": false,
         "resizable": false,
         "alwaysOnTop": true,
         "skipTaskbar": true,
         "transparent": false,
-        "shadow": true
+        "shadow": false
       }
     ]
   }

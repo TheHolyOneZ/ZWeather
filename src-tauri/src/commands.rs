@@ -250,7 +250,7 @@ pub async fn search_locations(query: String, language: Option<String>) -> Result
         urlencoding::encode(&lang),
     );
     let client = reqwest::Client::builder()
-        .user_agent("ZWeather/0.1.3")
+        .user_agent("ZWeather/0.1.4")
         .build()?;
     let resp: serde_json::Value = client.get(&url).send().await?.json().await?;
     let results = match resp["results"].as_array() {
@@ -400,7 +400,7 @@ pub async fn refresh_location_names(
     };
 
     let client = reqwest::Client::builder()
-        .user_agent("ZWeather/0.1.3")
+        .user_agent("ZWeather/0.1.4")
         .build()?;
 
     for (id, stored_name, lat, lon, geo_id) in locations {
